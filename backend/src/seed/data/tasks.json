@@ -1,0 +1,120 @@
+[
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need help writing a cover letter for a junior backend developer role.",
+      "prompt_a": "Write a cover letter for a junior backend developer applying to a fintech startup. I have experience with Node.js and PostgreSQL. Make it professional and impressive and really compelling and show my passion for technology and my eagerness to learn and grow in this field.",
+      "prompt_b": "Write a cover letter for a junior backend developer applying to a fintech startup. I have 8 months of experience with Node.js and PostgreSQL. The company values clean architecture and fast shipping. Under 250 words. Professional but not stiff. Do not use phrases like passionate about technology or eager to learn.",
+      "correct": "b",
+      "explanation": "Both are long. B wins because every word adds a real constraint. A is filler length — it adds words without reducing blank page."
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "Adding adjectives like amazing, detailed, and comprehensive to your prompt makes the output better.",
+      "correct": false,
+      "explanation": "Adjectives describe your wish for the output without telling AI how to achieve it. They add length without reducing blank page."
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Give me ideas.",
+      "options": [
+        { "text": "It is too short", "mistake_category": "length" },
+        { "text": "It gives AI no subject, no context, no format, and no purpose", "mistake_category": "vague" },
+        { "text": "AI cannot generate ideas", "mistake_category": "wrong_assumption" },
+        { "text": "It does not say please", "mistake_category": "irrelevant" }
+      ],
+      "correct_index": 1,
+      "explanation": "Length is not the problem. The problem is total absence of information — every dimension is blank."
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You want AI to explain how JWT authentication works.",
+      "prompts": [
+        "Explain JWT.",
+        "Explain JWT authentication like I am a backend developer who understands HTTP and sessions but has never implemented token-based auth. Focus on the flow: how tokens are created, sent, and verified. Use a short Node.js code example.",
+        "Can you tell me about JWT authentication and how it works in web apps, maybe with some details about implementation if possible?"
+      ],
+      "correct_order": [0, 2, 1],
+      "explanation": "Prompt 0 is pure blank page. Prompt 2 adds some context but maybe and if possible signal optional so AI may ignore them. Prompt 1 is precise — audience, scope, format, language all defined."
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Write a tweet about __.",
+      "blank_marker": "__",
+      "scenario": "You are announcing GRAIL — a prompt engineering learning app — to developers on X.",
+      "options": [
+        "something interesting in tech",
+        "my new app",
+        "a new desktop app that teaches prompt engineering through interactive lessons, aimed at CS students and developers, casual tone, under 240 characters, include a hook that creates curiosity",
+        "my app, make it good"
+      ],
+      "correct_index": 2,
+      "explanation": "Every other option still contains blank page. Option 2 specifies product, audience, tone, length constraint, and the emotional goal of the tweet."
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student needs to understand recursion for a CS course.",
+      "reference_output": "Recursion is when a function calls itself to solve a smaller version of the same problem.\n\nThink of it like Russian nesting dolls. Each doll opens to reveal a smaller identical doll inside, until you reach one that does not open — that is your base case.\n\nfunction countdown(n) {\n  if (n === 0) return;\n  console.log(n);\n  countdown(n - 1);\n}\n\nThe function keeps calling itself with n-1 until it hits zero. Without a base case it calls itself forever — stack overflow.",
+      "reference_prompt": "Explain recursion to someone who understands basic programming but has never seen a function call itself. Use a real-world analogy first, then show a simple JavaScript example. Make sure to explain what a base case is and what happens without one.",
+      "evaluation_criteria": ["non-technical audience specified", "analogy requested", "code example requested", "base case coverage requested"]
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "Someone wants practical sleep improvement advice.",
+      "reference_output": "3 things that will actually improve your sleep:\n\n1. No screens 45 minutes before bed — blue light delays melatonin by up to 3 hours\n2. Keep your room at 18C — your body needs to drop core temperature to initiate deep sleep\n3. Same wake time every day including weekends — your circadian rhythm does not understand days off\n\nWhat does not work: melatonin supplements, counting sheep, sleeping in on weekends.",
+      "reference_prompt": "Give me exactly 3 science-backed sleep tips in a numbered list. Each tip should include the reason why it works. Add a short section at the end on what does not work. Be direct, no fluff.",
+      "evaluation_criteria": ["numbered list format specified", "science-backed requirement", "specific number of tips", "what does not work section requested"]
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are a CS student applying for your first remote backend developer job. You have built three projects — a bookmark manager, a quiz app, and a mood tracking app with a global map. Write a prompt that asks AI to help you write a cold outreach message to a startup CTO on LinkedIn. The message should not sound like every other cold message they receive.",
+      "rubric_hints": "Should define tone, length, what to avoid, target recipient context, and include a clear call to action. Should not use vague adjectives as instructions."
+    }
+  }
+]

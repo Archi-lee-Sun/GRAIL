@@ -1,0 +1,42 @@
+[
+  {
+    "track_slug": "foundation",
+    "slug": "blank-page-problem",
+    "title": "The Blank Page Problem",
+    "display_order": 1,
+    "xp_reward": 20,
+    "concept_markdown": "## The Blank Page Problem\n\nYou have probably noticed something. Sometimes AI gives you an answer that feels almost magical. Other times it gives you something so generic and useless that you close the tab frustrated. The AI did not change. You did.\n\n### Why does this happen?\n\nAI does not think the way you think. When you ask a human for help they ask follow-up questions, read your face, remember your last conversation. AI does none of that.\n\nAI is a pattern-completion machine. It takes your input and finds the most statistically likely continuation. Everything it knows about what you want comes exclusively from the words you give it.\n\n### The core principle\n\n> Every word of vagueness in your prompt is a decision you hand to AI. Every decision AI makes for you is a chance it gets wrong.\n\n**Bad prompt:**\n```\nWrite me something about productivity.\n```\n\n**Good prompt:**\n```\nWrite a 200-word LinkedIn post for a burned-out software developer explaining why taking breaks actually increases output. Tone should be direct and data-backed, not motivational.\n```\n\nSame topic. Completely different result. The AI did not get smarter — you gave it less blank page to fill.\n\n### Remember\n\nA prompt is not a search query. Google is designed to handle vague input and guess what you want. AI does exactly what you tell it. These require completely different instincts. You are about to rewire yours."
+  },
+  {
+    "track_slug": "foundation",
+    "slug": "anatomy-of-a-prompt",
+    "title": "Anatomy of a Prompt",
+    "display_order": 2,
+    "xp_reward": 20,
+    "concept_markdown": "## Anatomy of a Prompt\n\nEvery good prompt has parts: context, instruction, format, constraints. Not all are always needed but you should know they exist.\n\n**Placeholder lesson — content to be finalized.**"
+  },
+  {
+    "track_slug": "foundation",
+    "slug": "specificity-spectrum",
+    "title": "The Specificity Spectrum",
+    "display_order": 3,
+    "xp_reward": 20,
+    "concept_markdown": "## The Specificity Spectrum\n\nThe single biggest lever in prompt quality. Moving from vague to precise.\n\n**Placeholder lesson — content to be finalized.**"
+  },
+  {
+    "track_slug": "foundation",
+    "slug": "role-assignment",
+    "title": "Role Assignment",
+    "display_order": 4,
+    "xp_reward": 20,
+    "concept_markdown": "## Role Assignment\n\nAssigning a persona changes everything about the output.\n\n**Placeholder lesson — content to be finalized.**"
+  },
+  {
+    "track_slug": "foundation",
+    "slug": "context-injection",
+    "title": "Context Injection",
+    "display_order": 5,
+    "xp_reward": 20,
+    "concept_markdown": "## Context Injection\n\nAI has no memory of your situation. You have to inject everything it needs to know.\n\n**Placeholder lesson — content to be finalized.**"
+  }
+]
