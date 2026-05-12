@@ -1,9 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { findUserByEmail, findUserByUsername, createUser } = require('../queries/auth.queries');
+const { getUserByEmail, getUserByUsername, createUser } = require('../queries/auth.queries');
 const { BCRYPT_ROUNDS, JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
+const { getUserById } = require('../queries/users.queries');
 
-const register = async (req , res) => {
+
+const register = async (req , res , next) => {
     const { email, username, password } = req.body;
     
     if (!email || !username || !password){
@@ -22,11 +24,11 @@ const register = async (req , res) => {
 
     try {
 
-        if(await findUserByEmail(email)){
+        if(await getUserByEmail(email)){
             return res.status(409).json({ error: 'email already in use' });
         }
 
-        if(await findUserByUsername(username)){
+        if(await getUserByUsername(username)){
             return res.status(409).json({ error: 'username already in use' });
         }
 
@@ -48,12 +50,11 @@ const register = async (req , res) => {
         });
 
     } catch (error) {
-        console.error('Error registering user:', error);
-        res.status(500).json({ error: 'Internal server error' });
+       next(error);
     }
 }
 
-const login = async (req , res) => {
+const login = async (req , res , next) => {
     const { email, password } = req.body;
 
     if (!email || !password){
@@ -62,7 +63,7 @@ const login = async (req , res) => {
 
     try {
 
-        const user = await findUserByEmail(email);
+        const user = await getUserByEmail(email);
         if(!user){
             return res.status(401).json({ error: 'Invalid credentials' });
         }
@@ -87,12 +88,28 @@ const login = async (req , res) => {
         });
 
     } catch (error) {
-        console.error('Error logging in user:', error);
-        res.status(500).json({ error: 'Internal server error' });
+       next(error);
     }
 }
 
+const getMe = async (req, res, next) => {
+    try {
+        const user = await getUserById(req.user.id);
+        if (!user) {
+            const error = new Error('User not found');
+            error.status = 404;
+            return next(error);
+        }
+        res.json({ user });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
 module.exports = { 
     register,
-    login 
+    login ,
+    getMe
 };

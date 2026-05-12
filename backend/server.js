@@ -1,11 +1,11 @@
 const app = require('./app');
-const { pool } = require('./src/config/db');
+const pool = require('./src/config/db');
 
 const PORT = process.env.PORT || 3000;
 
 async function start() {
   try {
-    await pool.query('SELECT 1');  // sanity check
+    await pool.query('SELECT 1'); 
     console.log('Database ready');
 
     app.listen(PORT, () => {
