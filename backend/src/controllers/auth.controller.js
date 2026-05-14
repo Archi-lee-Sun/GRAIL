@@ -1,6 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { getUserByEmail, getUserByUsername, createUser } = require('../queries/auth.queries');
+const {
+    getUserByEmail,
+    getUserByUsername,
+    createUser,
+    initializeUserLessonProgress
+} = require('../queries/auth.queries');
 const { BCRYPT_ROUNDS, JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
 const { getUserById } = require('../queries/users.queries');
 
@@ -34,6 +39,7 @@ const register = async (req , res , next) => {
 
         const password_hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
         const user = await createUser({email, username, password_hash});
+        await initializeUserLessonProgress(user.id);
         
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 

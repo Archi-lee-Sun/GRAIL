@@ -53,8 +53,32 @@ const createUser = async ({username , email , password_hash}) => {
     }
 }
 
+const initializeUserLessonProgress = async (userId) => {
+    const query = `
+        INSERT INTO user_lesson_progress (user_id, lesson_id, status)
+        SELECT
+            $1,
+            lessons.id,
+            CASE
+                WHEN tracks.is_foundation = true AND lessons.display_order = 1 THEN 'unlocked'
+                ELSE 'locked'
+            END
+        FROM lessons
+        INNER JOIN tracks ON tracks.id = lessons.track_id
+        ORDER BY tracks.display_order, lessons.display_order
+    `;
+
+    try {
+        await pool.query(query, [userId]);
+    } catch (error) {
+        console.error('Error initializing user lesson progress:', error);
+        throw error;
+    }
+};
+
 module.exports = { 
     getUserByEmail, 
     getUserByUsername, 
-    createUser 
+    createUser,
+    initializeUserLessonProgress
 };
