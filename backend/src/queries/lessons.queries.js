@@ -48,7 +48,26 @@ const getLessonTasksByStage = async (lessonId , stage) => {
     }
 };
 
+const getTaskById = async (taskId) => {
+    const query = `
+        SELECT id, lesson_id, stage, task_type, display_order, payload, xp_reward
+        FROM tasks
+        WHERE id = $1
+    `;
+
+    const values = [taskId];
+
+    try {
+        const result = await pool.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error fetching task:', error);
+        throw error;
+    }
+};
+
 module.exports = {
     getLessonBySlug,
-    getLessonTasksByStage
+    getLessonTasksByStage,
+    getTaskById
 };

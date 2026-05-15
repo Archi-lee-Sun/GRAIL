@@ -7,12 +7,14 @@ const {
 
 const {
     getLessonBySlug,
-    getLessonTasksByStage
+    getLessonTasksByStage,
+    getTaskById
 } = require('../queries/lessons.queries');
 
 
 const startSession = async (req , res , next) => {
-    const {slug , stage} = req.params;
+    const {slug} = req.params;
+    const stage = parseInt(req.params.stage);
     const userId = req.user.id
 
     try {
@@ -47,8 +49,12 @@ const startSession = async (req , res , next) => {
     }
 }
 
-const checkAnswer = async (req , res , next){
-    const {task_id , answer , stage} = req.params;
+const checkStage2Answer = (task, answer) => {
+    return task.payload.correct === answer;
+}
+
+const checkAnswer = async (req , res , next) => {
+    const {task_id , answer} = req.body;
     const userId = req.user.id
 
     try {
@@ -59,9 +65,9 @@ const checkAnswer = async (req , res , next){
 
         
         if(task.stage === 2){
-            const isCorrect = checkCodeAnswer(task.payload , answer);
-            await saveTaskAttempt(userId , task_id , stage , answer , isCorrect , task.explanation , task.xp_reward)
-            return res.json({isCorrect: isCorrect , feedback : task.explanation})
+            const isCorrect = checkStage2Answer(task , answer);
+            await saveTaskAttempt(userId , task_id , task.stage , { answer } , isCorrect , { explanation: task.payload.explanation } , task.xp_reward)
+            return res.json({isCorrect: isCorrect , feedback : { explanation: task.payload.explanation }})
         }
 
         
