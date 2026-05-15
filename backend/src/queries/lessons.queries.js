@@ -29,15 +29,15 @@ const getLessonBySlug = async (slug, userId) => {
     }
 };
 
-const getLessonTasks = async (lessonId) => {
+const getLessonTasksByStage = async (lessonId , stage) => {
     const query = `
         SELECT id, lesson_id, stage, task_type, display_order, payload, xp_reward
         FROM tasks 
-        WHERE lesson_id = $1
-        ORDER BY stage, display_order
+        WHERE lesson_id = $1 AND stage = $2
+        ORDER BY display_order
     `;
 
-    const values = [lessonId];
+    const values = [lessonId, stage];
 
     try {
         const result = await pool.query(query, values);
@@ -50,5 +50,5 @@ const getLessonTasks = async (lessonId) => {
 
 module.exports = {
     getLessonBySlug,
-    getLessonTasks
+    getLessonTasksByStage
 };

@@ -1,5 +1,6 @@
 const {
-    getLessonBySlug
+    getLessonBySlug,
+    getLessonTasks
 } = require('../queries/lessons.queries');
 
 const getLesson = async (req, res, next) => {
