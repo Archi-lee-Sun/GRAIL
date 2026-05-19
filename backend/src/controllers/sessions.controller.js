@@ -2,7 +2,9 @@ const {
     getLessonProgress,
     updateLessonStage,
     updateLessonStatus,
-    saveTaskAttempt
+    saveTaskAttempt ,
+    getTaskAttemptsByStage,
+    addXpToUser
 } = require('../queries/sessions.queries');
 
 const {
@@ -11,7 +13,11 @@ const {
     getTaskById
 } = require('../queries/lessons.queries');
 
-
+const stagetasksnumbers = {
+    2 : 5 ,
+    3: 2 , 
+    4 : 1 
+}
 const startSession = async (req , res , next) => {
     const {slug} = req.params;
     const stage = parseInt(req.params.stage);
@@ -83,7 +89,49 @@ const checkAnswer = async (req , res , next) => {
 
 }
 
+const completeStage = async (req , res , next) => {
+    const {slug , stage} = req.params;
+    const userId = req.user.id
+
+    try{
+        const lesson = await getLessonBySlug(slug , userId)
+        if(!lesson){
+            return res.status(404).json({error : 'Lesson not found'})
+        }
+
+        const tasks_attempts = await getTaskAttemptsByStage(userId , lesson.id , stage)
+        
+        const stageInt = parseInt(stage);
+        
+        if(tasks_attempts.length < stagetasksnumbers[stageInt] ){
+            return res.status(400).json({error : 'Not all tasks attempted'})
+        }
+
+        let totalXpEarned = 0;
+        tasks_attempts.forEach(attempt => {
+            totalXpEarned += attempt.xp_earned
+        })
+        await addXpToUser(userId , totalXpEarned)
+
+        if(stage < 4){
+            await updateLessonStage(userId , lesson.id , stageInt + 1)
+        } else {
+            await updateLessonStatus(userId , lesson.id , 'complete')
+            // there were be BFS to unlock next tracks 
+        }
+
+        return res.json({
+            xp_earned: totalXpEarned,
+            new_stage: stageInt < 4 ? stageInt + 1 : stageInt,
+            lesson_completed: stageInt === 4
+        })
+    }catch(error){
+        next(error)
+    }
+}
+
 module.exports = {
     startSession,
-    checkAnswer
+    checkAnswer,
+    completeStage
 }

@@ -72,10 +72,46 @@ const saveTaskAttempt = async(userId, taskId, stage, responseData, score, feedba
         throw error;
     }
 }
+const getTaskAttemptsByStage = async (userId , lessonId , stage) => {
+    const query = `
+       SELECT ta.* FROM task_attempts ta
+       JOIN tasks t ON t.id = ta.task_id
+       WHERE ta.user_id = $1 AND t.lesson_id = $2 AND ta.stage = $3
+    `;
 
+    const values = [userId , lessonId , stage];
+
+    try {
+        const result = await pool.query(query, values);
+        return result.rows;
+    } catch (error) {
+        console.error('Error fetching task attempts:', error);
+        throw error;
+    }
+}
+
+const addXpToUser = async (userId , xp) => {
+    const query = `
+        UPDATE users
+        SET xp = xp + $1
+        WHERE id = $2
+        RETURNING xp
+    `
+    const values = [xp, userId];
+
+    try {
+        const result = await pool.query(query, values);
+        return result.rows[0]
+    } catch (error) {
+        console.error('Error adding XP to user:', error);
+        throw error;
+    }
+}
 module.exports = {
     getLessonProgress,
     updateLessonStage,
     updateLessonStatus,
-    saveTaskAttempt
+    saveTaskAttempt,
+    getTaskAttemptsByStage,
+    addXpToUser
 }
