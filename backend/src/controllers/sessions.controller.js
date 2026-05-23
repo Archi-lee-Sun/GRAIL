@@ -117,7 +117,7 @@ const completeStage = async (req , res , next) => {
             await updateLessonStage(userId , lesson.id , stageInt + 1)
         } else {
             await updateLessonStatus(userId , lesson.id , 'complete')
-            // there were be BFS to unlock next tracks 
+            
         }
 
         return res.json({
