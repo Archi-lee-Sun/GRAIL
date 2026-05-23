@@ -1,5 +1,6 @@
 const { getUserById, getUserProgress, getDueReviews } = require('../queries/users.queries');
 const { updateSRS } = require('../services/srs.service');
+const { getLearningPath: getLearningPathService } = require('../services/graph.service');
 
 const getDashboard = async (req , res , next) => {
     const userId = req.user.id 
@@ -44,8 +45,26 @@ const submitReview = async (req, res, next) => {
     }
 }
 
+const getLearningPath = async (req, res, next) => {
+    const userId = req.user.id
+    const { lessonId } = req.params
+
+    try {
+        const learningPath = await getLearningPathService(userId, lessonId)
+
+        if(!learningPath){
+            return res.status(404).json({ message: 'No path found to this lesson from your current progress' });
+        }
+
+        return res.json({ learningPath: learningPath });
+    } catch(error){
+        next(error)
+    }
+}
+
 module.exports = {
     getDashboard,
     getReviews ,
-    submitReview
+    submitReview,
+    getLearningPath
 }
