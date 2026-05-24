@@ -53,7 +53,7 @@ const getLearningPath = async (req, res, next) => {
         const learningPath = await getLearningPathService(userId, lessonId)
 
         if(!learningPath){
-            return res.status(404).json({ message: 'No path found to this lesson from your current progress' });
+            return res.status(404).json({ message: 'Complete foundation lessons first to unlock a path to this lesson' });
         }
 
         return res.json({ learningPath: learningPath });

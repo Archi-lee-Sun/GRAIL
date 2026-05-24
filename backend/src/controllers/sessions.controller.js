@@ -13,6 +13,11 @@ const {
     getTaskById
 } = require('../queries/lessons.queries');
 
+const {
+     gradeStage3 ,
+    gradeStage4 
+} = require('../services/ai.service');
+
 const stagetasksnumbers = {
     2 : 5 ,
     3: 2 , 
@@ -78,8 +83,7 @@ const checkAnswer = async (req , res , next) => {
 
         
         if(task.stage === 3 || task.stage === 4){
-        // TODO: call ai.service here when ready, then saveTaskAttempt with real score + feedback
-         return res.json({ feedback: 'AI grading not yet implemented' });
+
         }
 
 

@@ -24,14 +24,6 @@
     "display_order": 3
   },
   {
-    "slug": "image-generation",
-    "title": "Image Generation",
-    "description": "Learn prompt engineering for Midjourney, DALL-E and Stable Diffusion.",
-    "is_foundation": false,
-    "unlock_after_lesson_count": 10,
-    "display_order": 4
-  },
-  {
     "slug": "decision-making",
     "title": "Decision Making & Strategy",
     "description": "Use AI as a thinking partner for complex decisions and strategy.",
