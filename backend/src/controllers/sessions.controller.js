@@ -23,6 +23,12 @@ const stagetasksnumbers = {
     3: 2 , 
     4 : 1 
 }
+
+const { 
+    getDirectDependents, 
+    checkAllDepsComplete 
+} = require('../queries/graph.queries');
+
 const startSession = async (req , res , next) => {
     const {slug} = req.params;
     const stage = parseInt(req.params.stage);
@@ -127,6 +133,13 @@ const completeStage = async (req , res , next) => {
             await updateLessonStage(userId , lesson.id , stageInt + 1)
         } else {
             await updateLessonStatus(userId , lesson.id , 'complete')
+            const dependents = await getDirectDependents(lesson.id);
+            for(const dependent of dependents){
+                const allComplete = await checkAllDepsComplete(userId, dependent.lesson_id);
+                if(allComplete){
+                    await updateLessonStatus(userId, dependent.lesson_id, 'unlocked');
+                }
+            }
         }
 
         return res.json({
