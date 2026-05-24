@@ -14,7 +14,7 @@ const {
 } = require('../queries/lessons.queries');
 
 const {
-     gradeStage3 ,
+    gradeStage3 ,
     gradeStage4 
 } = require('../services/ai.service');
 
@@ -83,10 +83,16 @@ const checkAnswer = async (req , res , next) => {
 
         
         if(task.stage === 3 || task.stage === 4){
-
+            if(task.stage === 3){
+                const gradingResult = await gradeStage3(answer, task.payload.reference_output, task.payload.scenario_context)
+                await saveTaskAttempt(userId , task_id , task.stage , {answer} , gradingResult.composite_score , gradingResult.feedback , task.xp_reward)
+                return res.json({passed: gradingResult.composite_score >= 7 , feedback : gradingResult.feedback , scores: gradingResult.scores , user_output: gradingResult.user_output , composite_score: gradingResult.composite_score})
+            } else {
+                const gradingResult = await gradeStage4(answer, task.payload.scenario, task.payload.rubric_hints)
+                await saveTaskAttempt(userId , task_id , task.stage , {answer} , gradingResult.composite_score , gradingResult.feedback , task.xp_reward)
+                return res.json({passed: gradingResult.composite_score >= 7 , feedback : gradingResult.feedback , scores: gradingResult.scores , user_output: gradingResult.user_output , composite_score: gradingResult.composite_score})
+            }
         }
-
-
     } catch(error){
         next(error)
     }
@@ -121,7 +127,6 @@ const completeStage = async (req , res , next) => {
             await updateLessonStage(userId , lesson.id , stageInt + 1)
         } else {
             await updateLessonStatus(userId , lesson.id , 'complete')
-            
         }
 
         return res.json({
