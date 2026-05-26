@@ -66,6 +66,7 @@ const checkAllDepsComplete = async (userId , lessonId) => {
         throw error;
     }
 }
+
 module.exports = {
     getAllDependencies,
     getCompletedLessons,

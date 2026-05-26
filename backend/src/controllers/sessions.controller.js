@@ -29,6 +29,11 @@ const {
     checkAllDepsComplete 
 } = require('../queries/graph.queries');
 
+const {
+    updateStreak 
+} = require('../services/streak.service');
+
+
 const startSession = async (req , res , next) => {
     const {slug} = req.params;
     const stage = parseInt(req.params.stage);
@@ -123,6 +128,8 @@ const completeStage = async (req , res , next) => {
             return res.status(400).json({error : 'Not all tasks attempted'})
         }
 
+        await updateStreak(userId);
+
         let totalXpEarned = 0;
         tasks_attempts.forEach(attempt => {
             totalXpEarned += attempt.xp_earned
@@ -157,3 +164,4 @@ module.exports = {
     checkAnswer,
     completeStage
 }
+ 

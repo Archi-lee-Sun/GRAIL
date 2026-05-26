@@ -1,6 +1,7 @@
 const { getUserById, getUserProgress, getDueReviews } = require('../queries/users.queries');
 const { updateSRS } = require('../services/srs.service');
 const { getLearningPath: getLearningPathService } = require('../services/graph.service');
+const {getTimeDifferenceInDays } = require('../services/streak.service')
 
 const getDashboard = async (req , res , next) => {
     const userId = req.user.id 
@@ -10,9 +11,11 @@ const getDashboard = async (req , res , next) => {
         if(!user){
             return res.status(404).json({ message: 'User not found' });
         }
+        const daysSinceActive = getTimeDifferenceInDays(user.last_active_date, new Date());
+        const displayStreak = daysSinceActive > 1 && user.streak_freeze_count === 0 ? 0 : user.streak_count;
 
         const progress = await getUserProgress(userId)
-        return res.json({ user : user , progress : progress })
+        return res.json({ user : { ...user, streak_count: displayStreak }, progress : progress })
 
     } catch (error) {
         next(error)
