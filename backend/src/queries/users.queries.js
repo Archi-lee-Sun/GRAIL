@@ -50,7 +50,6 @@ const getDueReviews = async (userId) => {
     }
 }
 
-const 
 module.exports = {
      getUserById,
      getUserProgress,

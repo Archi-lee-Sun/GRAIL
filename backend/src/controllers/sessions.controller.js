@@ -88,7 +88,7 @@ const checkAnswer = async (req , res , next) => {
         
         if(task.stage === 2){
             const isCorrect = checkStage2Answer(task , answer);
-            await saveTaskAttempt(userId , task_id , task.stage , { answer } , isCorrect , { explanation: task.payload.explanation } , task.xp_reward)
+            await saveTaskAttempt(userId , task_id , task.stage , { answer } , isCorrect ? 1 : 0 , { explanation: task.payload.explanation } , task.xp_reward)
             return res.json({isCorrect: isCorrect , feedback : { explanation: task.payload.explanation }})
         }
 
