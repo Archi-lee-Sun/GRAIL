@@ -39,7 +39,8 @@ const updateLessonStage = async (userId, lessonId, newStage) => {
 const updateLessonStatus = async (userId, lessonId, status) => {
     const query = `
         UPDATE user_lesson_progress
-        SET status = $1
+        SET status = $1,
+        completed_at = CASE WHEN $1 = 'complete' THEN NOW() ELSE completed_at END
         WHERE user_id = $2 AND lesson_id = $3
         RETURNING *
     `;
@@ -107,11 +108,29 @@ const addXpToUser = async (userId , xp) => {
         throw error;
     }
 }
+
+const getExistingAttempt = async (userId, taskId) => {
+    const query = `
+        SELECT * FROM task_attempts
+        WHERE user_id = $1 AND task_id = $2
+    `;
+    const values = [userId, taskId];
+
+    try {
+        const result = await pool.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error fetching existing attempt:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     getLessonProgress,
     updateLessonStage,
     updateLessonStatus,
     saveTaskAttempt,
     getTaskAttemptsByStage,
-    addXpToUser
+    addXpToUser,
+    getExistingAttempt
 }

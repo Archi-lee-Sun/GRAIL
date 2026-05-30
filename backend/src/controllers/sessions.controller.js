@@ -4,7 +4,8 @@ const {
     updateLessonStatus,
     saveTaskAttempt ,
     getTaskAttemptsByStage,
-    addXpToUser
+    addXpToUser,
+    getExistingAttempt
 } = require('../queries/sessions.queries');
 
 const {
@@ -21,7 +22,7 @@ const {
 const stagetasksnumbers = {
     2 : 5 ,
     3: 2 , 
-    4 : 1 
+    4 : 1   
 }
 
 const { 
@@ -32,6 +33,14 @@ const {
 const {
     updateStreak 
 } = require('../services/streak.service');
+
+const {
+    updateSRS
+} = require('../services/srs.service');
+
+const {
+    unlockVaultEntries
+} = require('../queries/vault.queries');
 
 
 const startSession = async (req , res , next) => {
@@ -72,7 +81,18 @@ const startSession = async (req , res , next) => {
 }
 
 const checkStage2Answer = (task, answer) => {
-    return task.payload.correct === answer;
+    switch(task.task_type) {
+        case 'which_better':
+        case 'true_false':
+        case 'fill_blank':
+            return task.payload.correct === answer;
+        case 'whats_wrong':
+            return task.payload.correct_index === answer;
+        case 'rank':
+            return JSON.stringify(task.payload.correct_order) === JSON.stringify(answer);
+        default:
+            return false;
+    }
 }
 
 const checkAnswer = async (req , res , next) => {
@@ -83,6 +103,11 @@ const checkAnswer = async (req , res , next) => {
         const task = await getTaskById(task_id);
         if(!task){
             return res.status(404).json({error : 'Task not found'})
+        }
+
+        const existing = await getExistingAttempt(userId, task_id);
+        if (existing) {
+            return res.status(400).json({ error: 'Task already attempted' });
         }
 
         
@@ -120,9 +145,18 @@ const completeStage = async (req , res , next) => {
             return res.status(404).json({error : 'Lesson not found'})
         }
 
-        const tasks_attempts = await getTaskAttemptsByStage(userId , lesson.id , stage)
-        
         const stageInt = parseInt(stage);
+
+        const progress = await getLessonProgress(userId, lesson.id);
+        if (progress.status === 'complete') {
+            return res.status(400).json({ error: 'Lesson already completed' });
+        }
+
+        if (progress.current_stage !== stageInt) {
+            return res.status(400).json({ error: 'Stage already completed' });
+        }
+
+        const tasks_attempts = await getTaskAttemptsByStage(userId , lesson.id , stageInt)
         
         if(tasks_attempts.length < stagetasksnumbers[stageInt] ){
             return res.status(400).json({error : 'Not all tasks attempted'})
@@ -136,7 +170,7 @@ const completeStage = async (req , res , next) => {
         })
         await addXpToUser(userId , totalXpEarned)
 
-        if(stage < 4){
+        if(stageInt < 4){
             await updateLessonStage(userId , lesson.id , stageInt + 1)
         } else {
             await updateLessonStatus(userId , lesson.id , 'complete')
@@ -147,6 +181,8 @@ const completeStage = async (req , res , next) => {
                     await updateLessonStatus(userId, dependent.lesson_id, 'unlocked');
                 }
             }
+            await unlockVaultEntries(userId, lesson.id);
+            await updateSRS(userId, lesson.id, 3);
         }
 
         return res.json({

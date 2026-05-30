@@ -14,7 +14,7 @@ const calculateArenaPoints = (submissions) => {
 
     const wilson = (p_hat + zSq / ( 2 * n ) - z * Math.sqrt((p_hat * (1 - p_hat)) / n + zSq / (4 * n * n))) / (1 + zSq / n)
     const arena_points = 1000 * wilson + best_composite_score * 10
-    return arena_points
+    return Math.floor(arena_points)
 }
 
 module.exports = {

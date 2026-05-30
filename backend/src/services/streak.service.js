@@ -15,6 +15,11 @@ const updateStreak = async (userId) => {
         const { last_active_date, streak_count, streak_freeze_count } = streakData;
 
         const today = new Date();
+        if (!last_active_date) {
+            await updateUserStreak(userId, 1, streak_freeze_count, today);
+            return;
+        }
+
         if (getTimeDifferenceInDays(last_active_date , today) === 1) {
             await updateUserStreak(userId, streak_count + 1, streak_freeze_count, today);
         } else if(getTimeDifferenceInDays(last_active_date , today) > 1) {

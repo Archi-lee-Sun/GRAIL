@@ -53,7 +53,7 @@ const getLearningPath = async (req, res, next) => {
     const { lessonId } = req.params
 
     try {
-        const learningPath = await getLearningPathService(userId, lessonId)
+        const learningPath = await getLearningPathService(userId, parseInt(lessonId))
 
         if(!learningPath){
             return res.status(404).json({ message: 'Complete foundation lessons first to unlock a path to this lesson' });

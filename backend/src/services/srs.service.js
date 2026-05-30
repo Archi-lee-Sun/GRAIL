@@ -11,7 +11,7 @@ const updateSRS = async (userId, lessonId, quality) => {
                 SM2_DEFAULT_EASE,
                 1,
                 0,
-                new Date(Date.now() + (1 * 24 * 60 * 60 * 1000)),
+                new Date(),
                 quality
             )
         }

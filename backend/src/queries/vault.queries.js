@@ -38,7 +38,26 @@ const getVaultEntryBySlug = async (slug , userId) => {
     }
 }
 
+const unlockVaultEntries = async (userId, lessonId) => {
+    const query = `
+        INSERT INTO user_vault_unlocks (user_id, vault_entry_id, unlocked_at)
+        SELECT $1, id, NOW()
+        FROM vault_entries
+        WHERE unlocks_after_lesson_id = $2
+        ON CONFLICT DO NOTHING
+    `;
+    const values = [userId, lessonId];
+
+    try {
+        await pool.query(query, values);
+    } catch (error) {
+        console.error('Error unlocking vault entries:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     getUnlockedVaultEntries,
-    getVaultEntryBySlug
+    getVaultEntryBySlug,
+    unlockVaultEntries
 }

@@ -9,9 +9,14 @@ const seed = async () => {
     try {
         await client.query('BEGIN');
 
+        await client.query('DELETE FROM arena_submissions');
+        await client.query('DELETE FROM user_vault_unlocks');
+        await client.query('DELETE FROM user_concept_srs');
+        await client.query('DELETE FROM task_attempts');
+        await client.query('DELETE FROM user_lesson_progress');
         await client.query('DELETE FROM vault_entries');
-        await client.query('DELETE FROM tasks');
         await client.query('DELETE FROM lesson_dependencies');
+        await client.query('DELETE FROM tasks');
         await client.query('DELETE FROM lessons');
         await client.query('DELETE FROM tracks');
 
@@ -44,9 +49,20 @@ const seed = async () => {
             `, [task.stage, task.task_type, task.display_order, task.xp_reward, JSON.stringify(task.payload), lessonMap[task.lesson_slug]]);
         }
 
+        await client.query(`
+            INSERT INTO lesson_dependencies (lesson_id, depends_on_id) VALUES
+            ($1, $2), ($3, $4), ($5, $6), ($7, $8)
+            ON CONFLICT DO NOTHING
+        `, [
+            lessonMap['anatomy-of-a-prompt'], lessonMap['blank-page-problem'],
+            lessonMap['specificity-spectrum'], lessonMap['anatomy-of-a-prompt'],
+            lessonMap['role-assignment'], lessonMap['specificity-spectrum'],
+            lessonMap['context-injection'], lessonMap['role-assignment']
+        ]);
+
         await client.query('COMMIT');
         console.log('Data seeded successfully!');
-
+        
     } catch(err){
         await client.query('ROLLBACK');
         console.error('Error seeding data:', err.message);
