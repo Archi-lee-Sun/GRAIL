@@ -22,6 +22,7 @@ const getUserProgress = async (userId) => {
         FROM user_lesson_progress ulp
         JOIN lessons l ON ulp.lesson_id = l.id
         WHERE ulp.user_id = $1
+        ORDER BY l.display_order ASC
     `
     const values = [userId]
     try {

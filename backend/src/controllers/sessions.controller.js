@@ -3,6 +3,7 @@ const {
     updateLessonStage,
     updateLessonStatus,
     saveTaskAttempt ,
+    updateTaskAttemptScore,
     getTaskAttemptsByStage,
     addXpToUser,
     getExistingAttempt
@@ -73,6 +74,20 @@ const startSession = async (req , res , next) => {
             return res.json({ concept_markdown})
         }
 
+        if(stage === 3 || stage === 4){
+            const tasks = await getLessonTasksByStage(lesson.id, stage);
+            const existingAttempts = await getTaskAttemptsByStage(userId, lesson.id, stage);
+            const passedTaskIds = existingAttempts
+                .filter(a => Number(a.score) > 0)
+                .map(a => a.task_id);
+            const tasksWithStatus = tasks.map(task => ({
+                ...task,
+                already_passed: passedTaskIds.includes(task.id)
+            }));
+
+            return res.json({ tasks: tasksWithStatus });
+        }
+
         const tasks = await getLessonTasksByStage(lesson.id , stage)
         return res.json({ tasks })
     } catch(error){
@@ -107,7 +122,14 @@ const checkAnswer = async (req , res , next) => {
 
         const existing = await getExistingAttempt(userId, task_id);
         if (existing) {
-            return res.status(400).json({ error: 'Task already attempted' });
+            if(task.stage === 2){
+                const isCorrect = checkStage2Answer(task, answer);
+                await updateTaskAttemptScore(task_id, userId, isCorrect ? 1 : 0, { explanation: task.payload.explanation });
+                return res.json({ isCorrect, feedback: { explanation: task.payload.explanation }, practice: true });
+            }
+            if(task.stage === 3 || task.stage === 4){
+                return res.json({ feedback: 'AI grading not yet implemented', practice: true });
+            }
         }
 
         
@@ -160,6 +182,23 @@ const completeStage = async (req , res , next) => {
         
         if(tasks_attempts.length < stagetasksnumbers[stageInt] ){
             return res.status(400).json({error : 'Not all tasks attempted'})
+        }
+
+        const passedAttempts = tasks_attempts.filter(attempt => Number(attempt.score) > 0);
+
+        if(stageInt === 2){
+            const requiredPassed = Math.ceil(stagetasksnumbers[2] * 0.8);
+            if(passedAttempts.length < requiredPassed){
+                return res.status(400).json({
+                    error: `You need at least ${requiredPassed} correct answers to complete this stage. You have ${passedAttempts.length}.`
+                });
+            }
+        } else {
+            if(passedAttempts.length < stagetasksnumbers[stageInt]){
+                return res.status(400).json({
+                    error: 'You must pass all tasks to complete this stage.'
+                });
+            }
         }
 
         await updateStreak(userId);

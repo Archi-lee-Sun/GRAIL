@@ -73,11 +73,30 @@ const saveTaskAttempt = async(userId, taskId, stage, responseData, score, feedba
         throw error;
     }
 }
+
+const updateTaskAttemptScore = async (taskId, userId, score, feedback) => {
+    const query = `
+        UPDATE task_attempts
+        SET score = $1, feedback = $2, attempted_at = NOW()
+        WHERE task_id = $3 AND user_id = $4
+    `;
+    const values = [score, JSON.stringify(feedback), taskId, userId];
+
+    try {
+        await pool.query(query, values);
+    } catch(error) {
+        console.error('Error updating attempt score:', error);
+        throw error;
+    }
+}
+
 const getTaskAttemptsByStage = async (userId , lessonId , stage) => {
     const query = `
-       SELECT ta.* FROM task_attempts ta
-       JOIN tasks t ON t.id = ta.task_id
-       WHERE ta.user_id = $1 AND t.lesson_id = $2 AND ta.stage = $3
+        SELECT DISTINCT ON (ta.task_id) ta.*
+        FROM task_attempts ta
+        JOIN tasks t ON t.id = ta.task_id
+        WHERE ta.user_id = $1 AND t.lesson_id = $2 AND ta.stage = $3
+        ORDER BY ta.task_id, ta.attempted_at DESC
     `;
 
     const values = [userId , lessonId , stage];
@@ -130,6 +149,7 @@ module.exports = {
     updateLessonStage,
     updateLessonStatus,
     saveTaskAttempt,
+    updateTaskAttemptScore,
     getTaskAttemptsByStage,
     addXpToUser,
     getExistingAttempt
