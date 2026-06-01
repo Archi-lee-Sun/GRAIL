@@ -2,6 +2,20 @@ const pool = require('../config/db');
 const tracks = require('./data/tracks.json');
 const lessons = require('./data/lessons.json');
 const tasks = require('./data/tasks.json');
+const vaultEntries = require('./data/vault.json'); 
+
+const vaultCategoryMap = {
+    Foundation: 'analysis',
+    Reasoning: 'reasoning',
+    Writing: 'efficiency',
+    Learning: 'analysis',
+    'Problem Solving': 'analysis',
+    Creativity: 'creative',
+    analysis: 'analysis',
+    reasoning: 'reasoning',
+    efficiency: 'efficiency',
+    creative: 'creative',
+};
 
 const seed = async () => {
     const client = await pool.connect();
@@ -21,28 +35,28 @@ const seed = async () => {
         await client.query('DELETE FROM tracks');
 
         const trackMap = {};
-        for(const track of tracks) {
+        for (const track of tracks) {
             const res = await client.query(`
-                INSERT INTO tracks (slug , title , description , is_foundation , unlock_after_lesson_count , display_order)
+                INSERT INTO tracks (slug, title, description, is_foundation, unlock_after_lesson_count, display_order)
                 VALUES ($1, $2, $3, $4, $5, $6)
-                RETURNING id , slug
+                RETURNING id, slug
             `, [track.slug, track.title, track.description, track.is_foundation, track.unlock_after_lesson_count, track.display_order]);
 
             trackMap[res.rows[0].slug] = res.rows[0].id;
         }
-        
+
         const lessonMap = {};
-        for(const lesson of lessons) {
+        for (const lesson of lessons) {
             const res = await client.query(`
-                INSERT INTO lessons (slug , title , display_order , xp_reward , concept_markdown , track_id)
+                INSERT INTO lessons (slug, title, display_order, xp_reward, concept_markdown, track_id)
                 VALUES ($1, $2, $3, $4, $5, $6)
-                RETURNING id , slug
+                RETURNING id, slug
             `, [lesson.slug, lesson.title, lesson.display_order, lesson.xp_reward, lesson.concept_markdown, trackMap[lesson.track_slug]]);
 
             lessonMap[res.rows[0].slug] = res.rows[0].id;
         }
 
-        for(const task of tasks) {
+        for (const task of tasks) {
             const lessonId = lessonMap[task.lesson_slug];
             if (!lessonId) {
                 console.warn(`Skipping task: unknown lesson_slug "${task.lesson_slug}"`);
@@ -50,7 +64,7 @@ const seed = async () => {
             }
 
             await client.query(`
-                INSERT INTO tasks (stage , task_type , display_order , xp_reward , payload , lesson_id)
+                INSERT INTO tasks (stage, task_type, display_order, xp_reward, payload, lesson_id)
                 VALUES ($1, $2, $3, $4, $5, $6)
             `, [task.stage, task.task_type, task.display_order, task.xp_reward, JSON.stringify(task.payload), lessonId]);
         }
@@ -60,22 +74,74 @@ const seed = async () => {
             ($1, $2), ($3, $4), ($5, $6), ($7, $8)
             ON CONFLICT DO NOTHING
         `, [
-            lessonMap['anatomy-of-a-prompt'], lessonMap['blank-page-problem'],
-            lessonMap['specificity-spectrum'], lessonMap['anatomy-of-a-prompt'],
-            lessonMap['role-assignment'], lessonMap['specificity-spectrum'],
-            lessonMap['context-injection'], lessonMap['role-assignment']
+            lessonMap['anatomy-of-a-prompt'],   lessonMap['blank-page-problem'],
+            lessonMap['specificity-spectrum'],   lessonMap['anatomy-of-a-prompt'],
+            lessonMap['role-assignment'],        lessonMap['specificity-spectrum'],
+            lessonMap['context-injection'],      lessonMap['role-assignment'],
         ]);
 
+        let vaultInserted = 0;
+        let vaultSkipped  = 0;
+
+        for (const entry of vaultEntries) {
+            const lessonId = lessonMap[entry.unlocks_after_lesson_slug];
+            const category = vaultCategoryMap[entry.category];
+
+            if (!lessonId) {
+                console.warn(`Skipping vault entry "${entry.slug}": unknown lesson_slug "${entry.unlocks_after_lesson_slug}"`);
+                vaultSkipped++;
+                continue;
+            }
+
+            if (!category) {
+                throw new Error(`Invalid vault category "${entry.category}" for entry "${entry.slug}". Allowed database categories: reasoning, efficiency, creative, analysis.`);
+            }
+
+            await client.query(`
+                INSERT INTO vault_entries (
+                    slug,
+                    title,
+                    category,
+                    theory_markdown,
+                    prompt_template,
+                    example_input,
+                    example_output,
+                    unlocks_after_lesson_id,
+                    display_order
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            `, [
+                entry.slug,
+                entry.title,
+                category,
+                entry.theory_markdown,
+                entry.prompt_template,
+                entry.example_input,
+                entry.example_output,
+                lessonId,
+                entry.display_order,
+            ]);
+
+            vaultInserted++;
+        }
+
         await client.query('COMMIT');
+
+        console.log('Tracks seeded:',       tracks.length);
+        console.log('Lessons seeded:',      Object.keys(lessonMap).length);
+        console.log('Vault entries seeded:', vaultInserted);
+        if (vaultSkipped > 0) {
+            console.warn('Vault entries skipped:', vaultSkipped);
+        }
         console.log('Data seeded successfully!');
-        
-    } catch(err){
+
+    } catch (err) {
         await client.query('ROLLBACK');
         console.error('Error seeding data:', err.message);
     } finally {
         client.release();
         process.exit();
     }
-}
+};
 
 seed();
