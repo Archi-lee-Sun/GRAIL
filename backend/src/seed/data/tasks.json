@@ -116,5 +116,565 @@
       "scenario": "You are a CS student applying for your first remote backend developer job. You have built three projects — a bookmark manager, a quiz app, and a mood tracking app with a global map. Write a prompt that asks AI to help you write a cold outreach message to a startup CTO on LinkedIn. The message should not sound like every other cold message they receive.",
       "rubric_hints": "Should define tone, length, what to avoid, target recipient context, and include a clear call to action. Should not use vague adjectives as instructions."
     }
-  }
+  },
+  {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You need a markdown README for a Python script that scrapes GitHub repositories.",
+    "prompt_a": "Write a README for a Python scraper script.",
+    "prompt_b": "Act as a technical writer. Write a markdown README for a Python GitHub scraper. Include sections for Installation, Usage, and Configuration. Constraint: Keep the usage instructions under 3 steps.",
+    "correct": "b",
+    "explanation": "Prompt B wins because it explicitly defines all four essential parts: context (technical writer), instruction (write a markdown README), format (sections for Installation, Usage, Configuration), and constraints (under 3 steps)."
+    }
+    },
+    {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+    "statement": "Every effective engineering prompt must contain all four core components: context, instruction, format, and constraints.",
+    "correct": false,
+    "explanation": "False. While knowing all four parts helps you diagnose weak prompts, simple or highly focused tasks often succeed with just instructions and constraints without needing explicit role context or strict formatting."
+    }
+    },
+    {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+    "prompt": "Review my JavaScript function for performance bottlenecks: \n\njavascript\nfunction processData(arr) {\n  let result = [];\n  for (let i = 0; i < arr.length; i++) {\n    if (!result.includes(arr[i])) result.push(arr[i]);\n  }\n  return result;\n}\n",
+    "options": [
+    {
+    "text": "The prompt is too long for the LLM to parse effectively.",
+    "mistake_category": "length"
+    },
+    {
+    "text": "The prompt lacks a specific format and structural constraints for the feedback.",
+    "mistake_category": "vague"
+    },
+    {
+    "text": "The prompt assumes the AI cannot read JavaScript.",
+    "mistake_category": "wrong_assumption"
+    },
+    {
+    "text": "The code snippet provided is completely irrelevant to the review instruction.",
+    "mistake_category": "irrelevant"
+    }
+    ],
+    "correct_index": 1,
+    "explanation": "The prompt has clear context and instruction, but it lacks structural constraints and format components. Without specifying how the output should look, the AI might give a long, conversational essay instead of a structured, actionable code review."
+    }
+    },
+    {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You want to explain how an API works to a non-technical product manager.",
+    "prompts": [
+    "Explain APIs.",
+    "Explain APIs to our non-technical product manager. Focus on how data travels between the frontend and backend. Format your answer as a 3-bullet analogy without technical jargon.",
+    "Explain what an API is to a product manager."
+    ],
+    "correct_order": [0, 2, 1],
+    "explanation": "Prompt 0 is the worst because it has no parts except a raw instruction. Prompt 2 is in the middle as it adds context (product manager). Prompt 1 is the best because it integrates context, clear instructions, thematic focus, and strict formatting/jargon constraints."
+    }
+    },
+    {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+    "template": "Write a script that automates Git commits. ",
+    "blank_marker": "__",
+    "scenario": "You need a shell script to automate regular git workflows, but want to make sure it handles errors properly.",
+    "options": [
+    "Make it work well.",
+    "Use Bash syntax.",
+    "Output a Bash script. If a git command fails, the script must exit immediately and log the error to a file named error.log.",
+    "Write it step by step."
+    ],
+    "correct_index": 2,
+    "explanation": "Option 2 is the only choice that provides both a distinct format component (Bash script) and actionable constraint components (exit immediately on error, log to error.log), which transforms a vague instruction into a production-ready template."
+    }
+    },
+    {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You are generating documentation for a React component library and need a highly structured documentation layout snippet.",
+    "reference_output": "### Card Component\n\nA UI container used to group related content.\n\n#### Props\n- title (string): The header text.\n- elevation (number): Shadow depth from 1 to 5.\n\n#### Usage\ntsx\n<Card title=\"Hello\" elevation={2} />\n",
+    "reference_prompt": "Act as a frontend documentarian. Document a React component named Card that takes title and elevation props. Use markdown with headings for Component Name, Props, and Usage. Ensure the usage example uses TSX formatting.",
+    "evaluation_criteria": [
+    "Explicitly states the role or context of a frontend documentarian",
+    "Includes structural components like specific markdown headings",
+    "Contains clear instructions detailing the component name and exact props",
+    "Imposes constraints requiring TSX syntax highlighting in the example"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You need to write an onboarding checklist email for a newly hired junior developer joining your engineering team.",
+    "reference_output": "A semantic section element with id 'contributions' containing an h2 heading and contribution cards, each card has a title, description paragraph, and an anchor link with class btn-link.",
+    "reference_prompt": "Write an onboarding email to a junior developer. Format it with a subject line and a numbered list containing exactly 3 distinct setup tasks. Constraint: Do not include any external links or HR jargon.",
+    "evaluation_criteria": [
+    "Specifies the exact target audience context of a junior developer",
+    "Instructs the AI to format the response with a subject line and numbered list",
+    "Applies a numerical constraint of exactly 3 distinct tasks",
+    "Imposes an exclusion constraint banning external links and HR jargon"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "anatomy-of-a-prompt",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+    "scenario": "You are a senior DevOps engineer mentoring an intern. Write a prompt that instructs an AI to generate a docker-compose setup for a Node.js app and a PostgreSQL database. The prompt must explicitly leverage all 4 parts of anatomy: context (who the AI is), instruction (what to build), format (how the output should look), and constraints (production-safety guidelines like avoiding plain text passwords).",
+    "rubric_hints": "context of devops engineer or mentor, instruction to create docker-compose for node and postgres, format specifying code block and explanations, constraints regarding environment variables or safety"
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You want to find performance issues in a PostgreSQL query execution plan.",
+    "prompt_a": "Look at this EXPLAIN plan and tell me why it is running slow.",
+    "prompt_b": "Analyze this PostgreSQL EXPLAIN ANALYZE text. Identify any Sequential Scans on tables with more than 10,000 rows, list the top 2 highest-cost nodes, and recommend specific indexes to add.",
+    "correct": "b",
+    "explanation": "Prompt B replaces the vague query 'why it is running slow' with hyper-specific metrics: isolating sequential scans, a row threshold, a top-2 limit, and an explicit deliverable (indexes)."
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+    "statement": "Making a prompt highly specific always means making it significantly longer and wordier.",
+    "correct": false,
+    "explanation": "False. Specificity is about precision, not length. Swapping a generic word like 'code' for a precise term like 'idempotent Express middleware' increases specificity without inflating prompt length."
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+    "prompt": "Write some test cases for my Python user authentication login function so that it doesn't break in production.",
+    "options": [
+    {
+    "text": "The prompt should be written in Python instead of conversational English.",
+    "mistake_category": "length"
+    },
+    {
+    "text": "The instruction is vague; it fails to specify the testing framework, edge cases to target, or output format.",
+    "mistake_category": "vague"
+    },
+    {
+    "text": "The prompt wrongly assumes that Python functions require production servers to test.",
+    "mistake_category": "wrong_assumption"
+    },
+    {
+    "text": "The phrase 'user authentication login' is entirely irrelevant to writing unit tests.",
+    "mistake_category": "irrelevant"
+    }
+    ],
+    "correct_index": 1,
+    "explanation": "The problem lies in the vague instructions. Phrases like 'some test cases' and 'so that it doesn't break' don't tell the AI whether you want pytest unit tests, integration tests, or specific boundary checks like empty strings or SQL injection inputs."
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You need dummy JSON data to mock a user profile service in your app.",
+    "prompts": [
+    "Give me a JSON payload representing a mock user account.",
+    "Generate a JSON array containing exactly 3 mock user objects. Each object must have fields for id (UUIDv4), username (string), and creationDate (ISO 8601 string). Do not include any extra nesting.",
+    "Create mock user JSON data containing an ID, username, and sign up date."
+    ],
+    "correct_order": [0, 2, 1],
+    "explanation": "Prompt 0 is extremely vague. Prompt 2 adds basic field requirements. Prompt 1 sits at the peak of the specificity spectrum, explicitly detailing data structures, item counts, exact data types, and formatting shapes."
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+    "template": "Write a short technical explanation of WebSocket connections .",
+    "blank_marker": "__",
+    "scenario": "You need an explanation of WebSockets tailored for a system design interview context.",
+    "options": [
+    "that sounds good and smart",
+    "for someone who doesn't know much about servers",
+    "limited to 150 words, focusing purely on the persistent full-duplex TCP connection handshake compared to traditional HTTP polling",
+    "and make it detailed"
+    ],
+    "correct_index": 2,
+    "explanation": "Option 2 sharply narrows the specificity spectrum by introducing explicit technical terms (full-duplex TCP, handshake, HTTP polling) and an exact constraint metric (150 words)."
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You want to generate an optimized CSS layout descriptor without generic properties.",
+    "reference_output": "A flexible container utilizing CSS Flexbox. It aligns items horizontally along the main axis with space distributed evenly between them. When the screen width drops below 600px, the container direction flips to vertical.",
+    "reference_prompt": "Explain how to structure a responsive CSS layout using Flexbox. Focus on horizontal alignment with space-between distribution, and explicitly detail a media query breakpoint at 600px that changes the flow to column.",
+    "evaluation_criteria": [
+    "Specifies the exact layout engine to use, which is Flexbox",
+    "Identifies precise alignment mechanics like horizontal space-between distribution",
+    "Defines a quantitative responsive breakpoint metric at exactly 600px",
+    "Details the specific structural structural shift to a column direction"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You need to generate an error message strategy for a failing API call due to rate limiting.",
+    "reference_output": "Status Code: 429 Too Many Requests\nMessage: Rate limit exceeded. You have made too many API calls in a short window.\nRetry-After Header: 30 seconds",
+    "reference_prompt": "Write a specific HTTP error handling payload configuration for a rate-limiting scenario. Include the exact 429 status code, a descriptive message, and a Retry-After header constraint set to 30 seconds.",
+    "evaluation_criteria": [
+    "Targets the specific failure mode of rate limiting",
+    "Specifies the precise numeric HTTP status code 429",
+    "Mandates the inclusion of a concrete response string description",
+    "Demands the exact configuration of a Retry-After header set to 30 seconds"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "specificity-spectrum",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+    "scenario": "You are writing a script to parse logs but need an AI to write a regex pattern for you. Write a highly specific prompt that asks for a regular expression. The prompt must avoid vague terms and instead supply specific parameters: the exact log format to match (e.g., ISO timestamp, followed by log level INFO/ERROR, followed by a message), what parts should be captured using named capture groups, and language constraints (e.g., Python re module).",
+    "rubric_hints": "exact log format description, specify named capture groups, python re module constraint, avoid vague terms like match logs"
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You want to find security issues in a piece of smart contract code written in Solidity.",
+    "prompt_a": "Check this Solidity smart contract code for security bugs.",
+    "prompt_b": "Act as an expert Web3 security auditor. Review this Solidity smart contract specifically searching for reentrancy vulnerabilities and integer overflow bugs. Provide technical recommendations for remediation.",
+    "correct": "b",
+    "explanation": "Prompt B successfully applies role assignment. By establishing the persona of a 'Web3 security auditor', it signals the AI to adopt a highly technical, critical mindset looking for industry-specific attack vectors like reentrancy."
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+    "statement": "Assigning a persona changes how the model processes information primarily by modifying its tone, vocabulary selection, and professional perspective.",
+    "correct": true,
+    "explanation": "True. Personas tap into specific subsets of training data, directly influencing word choice, level of technical depth, underlying assumptions, and the framing of solutions."
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+    "prompt": "You are a software engineer. Explain what a compiler does to someone who doesn't know anything about computers.",
+    "options": [
+    {
+    "text": "The prompt is too short to invoke a deep linguistic behavioral change in the model.",
+    "mistake_category": "length"
+    },
+    {
+    "text": "The assigned persona is too generic; 'software engineer' doesn't align closely enough with the target non-technical audience explanation goal.",
+    "mistake_category": "vague"
+    },
+    {
+    "text": "Compilers cannot be explained without advanced mathematics software concepts.",
+    "mistake_category": "wrong_assumption"
+    },
+    {
+    "text": "The concept of software engineering is completely irrelevant when talking about hardware compilers.",
+    "mistake_category": "irrelevant"
+    }
+    ],
+    "correct_index": 1,
+    "explanation": "The persona 'software engineer' is too broad. To explain a highly specialized topic to an absolute beginner, assigning a more specific persona like 'A high school computer science teacher who excels at using simple real-world analogies' would guide the vocabulary much more effectively."
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You want constructive feedback on your app's user onboarding sequence flow.",
+    "prompts": [
+    "Look at my app onboarding sequence and tell me what you think.",
+    "Act as a critical UX researcher who specializes in mobile product adoption. Evaluate this onboarding flow description and highlight points of friction where users are likely to drop off.",
+    "Imagine you are a product manager checking out an app onboarding screen."
+    ],
+    "correct_order": [0, 2, 1],
+    "explanation": "Prompt 0 completely lacks a persona. Prompt 2 gives a loose, generic role. Prompt 1 provides a hyper-targeted, expert persona ('UX researcher specializing in mobile product adoption') which directly triggers a specialized analytical perspective."
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+    "template": "Act as a . Review my code architecture proposal and suggest edge cases where horizontal scaling will break down.",
+    "blank_marker": "__",
+    "scenario": "You want to spot architectural flaws in a distributed system before writing code.",
+    "options": [
+    "person who writes software code",
+    "junior developer trying to learn databases",
+    "principal distributed systems architect with 15 years of infrastructure experience",
+    "tech startup founder pitching to venture capitalists"
+    ],
+    "correct_index": 2,
+    "explanation": "Option 2 injects a highly authoritative, domain-expert persona that forces the model to look past superficial syntax and analyze underlying deep systemic bottlenecks like network partitions or data consistency."
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You need an answer from the perspective of an aggressive, detail-oriented QA engineer uncovering critical edge-case bugs.",
+    "reference_output": "Bug Report: The registration form fails silently when a user enters a username exactly 256 characters long. \n\nSeverity: High. \nSteps to Reproduce: Input a 256-character string into the name field and submit. \nExpected behavior: Validation error banner displayed. \nActual behavior: Form spins infinitely with no network resolution.",
+    "reference_prompt": "Act as a meticulous QA engineer. Write a professional bug report for a registration form that freezes when processing extreme boundary inputs. Structure it with clear blocks for Severity, Steps, Expected, and Actual behaviors.",
+    "evaluation_criteria": [
+    "Assigns a precise persona of a QA engineer or tester",
+    "Adopts the formal, clinical tone expected of an issue tracking bug report",
+    "Focuses on technical testing edge cases such as boundary inputs",
+    "Structures the output cleanly into explicit QA analytical fields"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You need an engineering manager's diplomatic rejection letter to a candidate who had great soft skills but missed critical systemic edge cases during a coding interview.",
+    "reference_output": "Thank you for taking the time to interview with us. We appreciated your collaborative communication style during the pair programming exercise. However, we have decided not to move forward. Our team requires deep foundational experience with concurrent systems design, and your solution lacked edge-case handling for high-throughput race conditions.",
+    "reference_prompt": "Act as an empathetic but firm engineering manager. Write a brief rejection letter to a developer candidate. Praise their communication but explicitly state they lacked the concurrent systems design depth required for the role.",
+    "evaluation_criteria": [
+    "Implements the specific organizational persona of an engineering manager",
+    "Balances empathy with firm professional boundaries",
+    "Pinpoints a highly explicit technical reason for the rejection",
+    "Maintains a corporate communication tone tailored for interview candidates"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "role-assignment",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+    "scenario": "You are preparing for a difficult technical behavioral interview at a top tech company. Write a prompt that commands the AI to act as an uncompromising, senior technical interviewer. The prompt must establish a distinct persona, instruct the AI to ask you one challenging system design question at a time, wait for your response, and critique your answers harshly from a perspective of scalability, cost efficiency, and fault tolerance.",
+    "rubric_hints": "persona of a senior technical interviewer, behavior directive to ask one question at a time, interactive simulation rules, analytical evaluation metrics like cost or scalability"
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You are trying to resolve an deployment issue with a service on your company's internal cluster infrastructure.",
+    "prompt_a": "Why is my application crashing on startup during deployment?",
+    "prompt_b": "My Node.js application is crashing on startup when deployed to an on-premise Kubernetes cluster. It runs perfectly locally on Docker Mac. Here are the last 3 lines of logs: OOMKilled, Exit Code 137.",
+    "correct": "b",
+    "explanation": "Prompt B wins because it injects critical situational background context (on-premise Kubernetes vs local Docker environment) and exact execution artifacts (OOMKilled logs) that the AI would have no way of guessing otherwise."
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+    "statement": "Large language models retain background context about your specific hardware setup, programming goals, and team architecture across separate chat sessions.",
+    "correct": false,
+    "explanation": "False. LLMs are completely stateless between distinct chat sessions. They have zero memory of your personal situation, tech stack configurations, or constraints unless you actively inject that context into every prompt window."
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+    "prompt": "Optimize this database query for speed:\nSELECT * FROM users JOIN orders ON users.id = orders.user_id WHERE orders.status = 'pending';",
+    "options": [
+    {
+    "text": "The raw SQL code provided contains massive structural syntax bugs.",
+    "mistake_category": "length"
+    },
+    {
+    "text": "The prompt fails to inject critical system context, such as the database engine type, table schemas, index states, or target data volumes.",
+    "mistake_category": "vague"
+    },
+    {
+    "text": "The prompt assumes the model already knows the passwords to your private databases.",
+    "mistake_category": "wrong_assumption"
+    },
+    {
+    "text": "The SELECT statement syntax is completely irrelevant to standard optimization rules.",
+    "mistake_category": "irrelevant"
+    }
+    ],
+    "correct_index": 1,
+    "explanation": "An LLM cannot reliably optimize database queries in isolation. Without injected situational context regarding whether this is running on PostgreSQL or MySQL, what indexes currently exist, and whether the tables hold 100 rows or 50 million rows, the optimization advice will be generic and potentially counterproductive."
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+    "scenario": "You need to fix a broken layout bug in a React web application component.",
+    "prompts": [
+    "Fix my button layout bug.",
+    "My React button component is breaking layout alignment. I am using TailwindCSS. The button is placed inside a flex container but is stretching out of bounds. Here is the component markup: <div className='flex'><button className='w-full'>Click</button></div>",
+    "Fix the layout of a button that is breaking inside a web interface box container."
+    ],
+    "correct_order": [0, 2, 1],
+    "explanation": "Prompt 0 provides zero context. Prompt 2 gives very minimal framework hints. Prompt 1 successfully injects the entire environment context: the UI library (React), styling paradigm (TailwindCSS), parent container structure (flex layout), and precise inline code snippet."
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+    "template": "Write a deployment guide for my API service. ",
+    "blank_marker": "__",
+    "scenario": "You need a deployment runbook tailored specifically to your company's specialized hosting pipeline.",
+    "options": [
+    "Make it look corporate and professional.",
+    "Assume I am deploying it to a modern cloud hosting website.",
+    "Context: The service is a Python FastAPI app. We deploy it using GitHub Actions CI/CD pipelines pushing to an AWS ECS Fargate cluster with a PostgreSQL RDS instance.",
+    "Keep it simple so anyone can run it."
+    ],
+    "correct_index": 2,
+    "explanation": "Option 2 injects structural environmental context (FastAPI, GitHub Actions, AWS ECS Fargate, RDS), turning a generic task into a customized runtime template for your engineering reality."
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You need to write a post-mortem incident report for an outage on a legacy platform with unique architectural dependencies.",
+    "reference_output": "Incident Post-Mortem\n\nContext: Our application serves 50,000 active legacy clients using a self-hosted Redis instance for session caching.\nRoot Cause: High traffic spike led to Redis exceeding its memory allocation limits, forcing eviction loops.\nResolution: Increased Redis cluster memory limits and implemented a circuit breaker pattern on the connection layer.",
+    "reference_prompt": "Write an incident post-mortem report. Inject the situational context that we serve 50,000 legacy clients using self-hosted Redis caching. Identify the root cause as a memory exhaustion eviction loop and note the resolution.",
+    "evaluation_criteria": [
+    "Explicitly states the operational scale context of 50,000 users",
+    "Includes the explicit architectural context of a self-hosted Redis instance",
+    "Details the structural breakdown cause of memory exhaustion eviction loops",
+    "Delineates the concrete resolution tracking items implemented"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+    "scenario_context": "You need to write an API migration notice to an integration partner team using an outdated authentication protocol.",
+    "reference_output": "Attention Partners: We are deprecating API v1 on October 1st. Your integration currently utilizes Basic Authentication, which will no longer be supported. To maintain service connectivity, you must update your middleware pipeline to pass OAuth2 Bearer Tokens instead. Please consult the attached migration checklist.",
+    "reference_prompt": "Write an API deprecation announcement for integration partners. Explicitly inject the context that they are currently using Basic Auth on API v1, specify an October 1st deadline, and give concrete instructions to switch to OAuth2 Bearer Tokens.",
+    "evaluation_criteria": [
+    "Injects the specific integration system state context of Basic Auth usage",
+    "Provides a clear business landscape context timeline with an October 1st deadline",
+    "Names the exact targeted replacement authentication protocol of OAuth2",
+    "Addresses the external integration partner engineering audience context directly"
+    ]
+    }
+    },
+    {
+    "lesson_slug": "context-injection",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+    "scenario": "Your legacy Python application is running unacceptably slow, but you can't just rewrite it. Write a prompt requesting performance optimization advice. You must inject comprehensive situational context that a human team member would need: the specific language and framework version, the operating environment constraints, database integration setups, historical bottlenecks you've already verified, and the absolute business boundaries (e.g., zero budget for upgrading server hardware).",
+    "rubric_hints": "inject explicit framework or language versions, specify database or environment landscape context, list historical testing parameters or bottlenecks, detail strict resource or hardware budget boundaries"
+    }
+    }
 ]

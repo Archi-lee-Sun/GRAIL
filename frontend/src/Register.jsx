@@ -32,6 +32,23 @@ function AuthLogo() {
   )
 }
 
+function EyeIcon({ open }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="2" />
+      {!open && <path d="M4 20 20 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
+    </svg>
+  )
+}
+
 export default function Register() {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
@@ -105,8 +122,13 @@ export default function Register() {
               autoComplete="new-password"
               required
             />
-            <button type="button" onClick={() => setShowPassword((value) => !value)}>
-              {showPassword ? 'Hide' : 'Show'}
+            <button
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              title={showPassword ? 'Hide password' : 'Show password'}
+            >
+              <EyeIcon open={showPassword} />
             </button>
           </div>
         </label>
@@ -219,20 +241,27 @@ body,
 }
 
 .password-field input {
-  padding-right: 76px;
+  padding-right: 48px;
 }
 
 .password-field button {
   position: absolute;
   top: 50%;
-  right: 8px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
   transform: translateY(-50%);
   color: #F59E0B;
   cursor: pointer;
   background: transparent;
   border: 0;
-  font-size: 12px;
-  font-weight: 900;
+  border-radius: 6px;
+}
+
+.password-field button:hover {
+  background: rgba(245, 158, 11, 0.12);
 }
 
 .auth-card input:focus {

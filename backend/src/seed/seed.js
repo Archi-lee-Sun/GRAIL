@@ -43,10 +43,16 @@ const seed = async () => {
         }
 
         for(const task of tasks) {
+            const lessonId = lessonMap[task.lesson_slug];
+            if (!lessonId) {
+                console.warn(`Skipping task: unknown lesson_slug "${task.lesson_slug}"`);
+                continue;
+            }
+
             await client.query(`
                 INSERT INTO tasks (stage , task_type , display_order , xp_reward , payload , lesson_id)
                 VALUES ($1, $2, $3, $4, $5, $6)
-            `, [task.stage, task.task_type, task.display_order, task.xp_reward, JSON.stringify(task.payload), lessonMap[task.lesson_slug]]);
+            `, [task.stage, task.task_type, task.display_order, task.xp_reward, JSON.stringify(task.payload), lessonId]);
         }
 
         await client.query(`

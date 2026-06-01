@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const API_BASE = 'http://localhost:3000/api'
 
@@ -67,7 +67,7 @@ function XPModal({ result, onBack }) {
   )
 }
 
-function ConceptReader({ markdown, onComplete, completing }) {
+function ConceptReader({ markdown, onComplete, completing, isReplay, onBack }) {
   const [expanded, setExpanded] = useState(false)
   const [overflowing, setOverflowing] = useState(false)
   const contentRef = useRef(null)
@@ -101,8 +101,8 @@ function ConceptReader({ markdown, onComplete, completing }) {
         )}
       </button>
 
-      <button type="button" className="understand-button" onClick={onComplete} disabled={completing}>
-        {completing ? 'SAVING...' : 'I UNDERSTAND ✓'}
+      <button type="button" className="understand-button" onClick={isReplay ? onBack : onComplete} disabled={completing}>
+        {isReplay ? 'BACK TO MAP' : completing ? 'SAVING...' : 'I UNDERSTAND ✓'}
       </button>
     </>
   )
@@ -308,7 +308,7 @@ function calculateStage2Correct(task, answer) {
   return false
 }
 
-function StageTwoTasks({ tasks, slug, stage, token, onStageComplete }) {
+function StageTwoTasks({ tasks, slug, stage, token, onStageComplete, isReplay, onBack }) {
   const [taskIndex, setTaskIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [checked, setChecked] = useState(false)
@@ -373,8 +373,8 @@ function StageTwoTasks({ tasks, slug, stage, token, onStageComplete }) {
         )}
 
         {checked && showNext && isLastTask && (
-          <button type="button" className="check-button ready" onClick={onStageComplete}>
-            COMPLETE STAGE →
+          <button type="button" className="check-button ready" onClick={isReplay ? onBack : onStageComplete}>
+            {isReplay ? 'BACK TO MAP' : 'COMPLETE STAGE →'}
           </button>
         )}
       </div>
@@ -384,7 +384,7 @@ function StageTwoTasks({ tasks, slug, stage, token, onStageComplete }) {
 
 function ScoreRow({ label, score }) {
   const value = Number(score || 0)
-  const color = value >= 7 ? '#10B981' : value >= 5 ? '#F59E0B' : '#EF4444'
+  const color = value >= 7 ? '#7C3AED' : value >= 5 ? '#F59E0B' : '#EF4444'
 
   return (
     <div className="score-row">
@@ -434,7 +434,7 @@ function GradingResults({ result, dimensions }) {
   )
 }
 
-function PromptGradingStage({ tasks, slug, stage, token, onStageComplete }) {
+function PromptGradingStage({ tasks, slug, stage, token, onStageComplete, isReplay, onBack }) {
   const [taskIndex, setTaskIndex] = useState(0)
   const [answer, setAnswer] = useState('')
   const [result, setResult] = useState(null)
@@ -543,8 +543,8 @@ function PromptGradingStage({ tasks, slug, stage, token, onStageComplete }) {
           </button>
         )}
         {result && isLastTask && (
-          <button type="button" className="check-button ready" onClick={onStageComplete}>
-            COMPLETE STAGE
+          <button type="button" className="check-button ready" onClick={isReplay ? onBack : onStageComplete}>
+            {isReplay ? 'BACK TO MAP' : 'COMPLETE STAGE'}
           </button>
         )}
       </div>
@@ -555,7 +555,9 @@ function PromptGradingStage({ tasks, slug, stage, token, onStageComplete }) {
 export default function Lesson() {
   const { slug, stage } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const stageNumber = Number(stage || 1)
+  const replayFromRoute = Boolean(location.state?.replay)
   const [lessonTitle, setLessonTitle] = useState('Lesson')
   const [conceptMarkdown, setConceptMarkdown] = useState('')
   const [tasks, setTasks] = useState([])
@@ -566,6 +568,7 @@ export default function Lesson() {
   const [initialStreak, setInitialStreak] = useState(null)
   const [alreadyPassedMessage, setAlreadyPassedMessage] = useState('')
   const [allAlreadyPassed, setAllAlreadyPassed] = useState(false)
+  const [isReplay, setIsReplay] = useState(replayFromRoute)
   const token = localStorage.getItem('token')
 
   useEffect(() => {
@@ -578,6 +581,7 @@ export default function Lesson() {
     setError('')
     setAlreadyPassedMessage('')
     setAllAlreadyPassed(false)
+    setIsReplay(replayFromRoute)
 
     Promise.all([
       fetch(`${API_BASE}/lessons/${slug}`, { headers: { Authorization: `Bearer ${token}` } }),
@@ -586,16 +590,23 @@ export default function Lesson() {
     ])
       .then(async ([lessonResponse, stageResponse, dashboardResponse]) => {
         if (!lessonResponse.ok) throw new Error(`Lesson request failed (${lessonResponse.status})`)
+        const lessonData = await lessonResponse.json()
+        setLessonTitle(location.state?.lessonTitle || lessonData.lesson?.title || lessonData.title || slug)
+
         if (stageResponse.status === 403) {
+          if (replayFromRoute) {
+            setIsReplay(true)
+            setConceptMarkdown(stageNumber === 1 ? lessonData.lesson?.concept_markdown || lessonData.concept_markdown || '' : '')
+            setTasks([])
+            return
+          }
           setError('This stage is not available yet. Return to the map to continue your journey.')
           return
         }
         if (!stageResponse.ok) throw new Error(`Stage request failed (${stageResponse.status})`)
 
-        const lessonData = await lessonResponse.json()
         const stageData = await stageResponse.json()
         const dashboardData = dashboardResponse.ok ? await dashboardResponse.json() : null
-        setLessonTitle(lessonData.lesson?.title || lessonData.title || slug)
         setConceptMarkdown(stageData.concept_markdown || '')
         if (stageNumber === 3 || stageNumber === 4) {
           const allTasks = stageData.tasks || []
@@ -616,9 +627,10 @@ export default function Lesson() {
       })
       .catch((fetchError) => setError(fetchError.message || 'Unable to load lesson'))
       .finally(() => setLoading(false))
-  }, [navigate, slug, stageNumber, token])
+  }, [location.state?.lessonTitle, navigate, replayFromRoute, slug, stageNumber, token])
 
   const completeStage = async () => {
+    if (completing || isReplay) return
     setCompleting(true)
     setError('')
 
@@ -659,6 +671,11 @@ export default function Lesson() {
 
       <main className="lesson-main">
         {loading && <div className="state-card">Loading...</div>}
+        {!loading && isReplay && (
+          <div className="replay-banner">
+            You already passed this stage. Practice mode is open, but XP will not be awarded.
+          </div>
+        )}
         {!loading && error && (
           <div className="state-card error">
             {error}
@@ -666,7 +683,13 @@ export default function Lesson() {
           </div>
         )}
         {!loading && !error && stageNumber === 1 && (
-          <ConceptReader markdown={conceptMarkdown} onComplete={completeStage} completing={completing} />
+          <ConceptReader
+            markdown={conceptMarkdown}
+            onComplete={completeStage}
+            completing={completing}
+            isReplay={isReplay}
+            onBack={() => navigate('/dashboard')}
+          />
         )}
         {!loading && !error && stageNumber === 2 && (
           <StageTwoTasks
@@ -675,6 +698,8 @@ export default function Lesson() {
             stage={stageNumber}
             token={token}
             onStageComplete={completeStage}
+            isReplay={isReplay}
+            onBack={() => navigate('/dashboard')}
           />
         )}
         {!loading && !error && (stageNumber === 3 || stageNumber === 4) && (
@@ -683,8 +708,13 @@ export default function Lesson() {
             {allAlreadyPassed ? (
               <div className="state-card">
                 All tasks in this stage are already passed.
-                <button type="button" className="map-back-button" onClick={completeStage} disabled={completing}>
-                  {completing ? 'Completing...' : 'COMPLETE STAGE'}
+                <button
+                  type="button"
+                  className="map-back-button"
+                  onClick={isReplay ? () => navigate('/dashboard') : completeStage}
+                  disabled={completing}
+                >
+                  {isReplay ? 'BACK TO MAP' : completing ? 'Completing...' : 'COMPLETE STAGE'}
                 </button>
               </div>
             ) : (
@@ -694,6 +724,8 @@ export default function Lesson() {
                 stage={stageNumber}
                 token={token}
                 onStageComplete={completeStage}
+                isReplay={isReplay}
+                onBack={() => navigate('/dashboard')}
               />
             )}
           </>
@@ -1088,14 +1120,15 @@ button {
 .tips-card {
   margin-top: 16px;
   padding: 16px;
-  background: #0D2E1F;
-  border: 1px solid #10B981;
+  background: #1F1040;
+  border: 1px solid #7C3AED;
   border-radius: 8px;
 }
 
 .tips-card strong {
-  color: #10B981;
+  color: #F1F0FF;
   font-size: 14px;
+  font-weight: 600;
 }
 
 .tips-card ul {
@@ -1110,6 +1143,7 @@ button {
   margin-top: 24px;
   padding: 24px;
   background: #0D1117;
+  border: 1px solid #2D4A2D;
   border-radius: 12px;
 }
 
@@ -1131,8 +1165,8 @@ button {
 }
 
 .score-meta span {
-  color: #9CA3AF;
-  font-weight: 850;
+  color: #F1F0FF;
+  font-weight: 600;
 }
 
 .score-meta strong {
@@ -1142,8 +1176,8 @@ button {
 .score-bar {
   height: 8px;
   overflow: hidden;
-  background: #1F361F;
-  border-radius: 999px;
+  background: #2D4A2D;
+  border-radius: 4px;
 }
 
 .score-bar span {
@@ -1170,13 +1204,13 @@ button {
 }
 
 .pass-badge.passed {
-  color: #34D399;
-  background: #0D2E1F;
+  color: #FFFFFF;
+  background: #7C3AED;
 }
 
 .pass-badge.failed {
-  color: #F87171;
-  background: #2E0D0D;
+  color: #FFFFFF;
+  background: #EF4444;
 }
 
 .user-output {
@@ -1187,9 +1221,9 @@ button {
 .dimension-feedback strong {
   display: block;
   margin-bottom: 8px;
-  color: #9CA3AF;
+  color: #F1F0FF;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .user-output p {
@@ -1291,6 +1325,16 @@ button {
   color: #F59E0B;
   background: #142314;
   border: 1px solid #2D4A2D;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-weight: 850;
+}
+
+.replay-banner {
+  margin-bottom: 18px;
+  color: #F59E0B;
+  background: #142314;
+  border: 1px solid #7C3AED;
   border-radius: 10px;
   padding: 12px 16px;
   font-weight: 850;

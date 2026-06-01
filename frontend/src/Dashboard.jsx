@@ -43,27 +43,29 @@ function GobletIcon() {
 
 function SwordsIcon() {
   return (
-    <svg width="36" height="36" viewBox="0 0 48 48" aria-hidden="true">
+    <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
       <defs>
-        <linearGradient id="swordBlade" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#F3F4F6" />
-          <stop offset="0.48" stopColor="#C0C0C0" />
-          <stop offset="1" stopColor="#A0A0A0" />
+        <linearGradient id="arenaBlade" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#F8FAFC" />
+          <stop offset="0.45" stopColor="#C0C0C0" />
+          <stop offset="1" stopColor="#8A8A8A" />
         </linearGradient>
       </defs>
-      <g transform="translate(19 18) rotate(38)">
-        <path d="M-3 -22 0 -29 3 -22 1.5 -1h-3L-3 -22Z" fill="url(#swordBlade)" />
-        <path d="M1 -22 0 -29 3 -22 1.5 -1H.4Z" fill="#A0A0A0" opacity="0.65" />
-        <rect x="-8" y="3" width="16" height="4" rx="2" fill="#C0C0C0" />
-        <rect x="-2.5" y="10" width="5" height="14" rx="2" fill="#8B4513" />
-        <circle cx="0" cy="28" r="3.5" fill="#F59E0B" />
-      </g>
-      <g transform="translate(29 18) rotate(-38)">
-        <path d="M-3 -22 0 -29 3 -22 1.5 -1h-3L-3 -22Z" fill="url(#swordBlade)" />
-        <path d="M1 -22 0 -29 3 -22 1.5 -1H.4Z" fill="#A0A0A0" opacity="0.65" />
-        <rect x="-8" y="3" width="16" height="4" rx="2" fill="#C0C0C0" />
-        <rect x="-2.5" y="10" width="5" height="14" rx="2" fill="#8B4513" />
-        <circle cx="0" cy="28" r="3.5" fill="#F59E0B" />
+      <g transform="translate(16 15)">
+        <g transform="rotate(42)">
+          <path d="M-2 -15 L0 -20 L2 -15 L1 4 L-1 4 Z" fill="url(#arenaBlade)" />
+          <path d="M0 -20 L2 -15 L1 4 L0 4 Z" fill="#9CA3AF" opacity="0.55" />
+          <rect x="-9" y="5.5" width="18" height="4" rx="2" fill="#F59E0B" />
+          <rect x="-2.5" y="11" width="5" height="12" rx="2" fill="#8B4513" />
+          <circle cx="0" cy="25" r="4" fill="#F59E0B" />
+        </g>
+        <g transform="rotate(-42)">
+          <path d="M-2 -15 L0 -20 L2 -15 L1 4 L-1 4 Z" fill="url(#arenaBlade)" />
+          <path d="M0 -20 L2 -15 L1 4 L0 4 Z" fill="#9CA3AF" opacity="0.55" />
+          <rect x="-9" y="5.5" width="18" height="4" rx="2" fill="#F59E0B" />
+          <rect x="-2.5" y="11" width="5" height="12" rx="2" fill="#8B4513" />
+          <circle cx="0" cy="25" r="4" fill="#F59E0B" />
+        </g>
       </g>
     </svg>
   )
@@ -98,13 +100,12 @@ function SpellbookIcon() {
   )
 }
 
-function PathFinderIcon() {
+function FocusIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-      <path d="M8 24C14 24 10 8 18 8c4.5 0 5.8 3.5 6 6.5" fill="none" stroke="#7C3AED" strokeWidth="2.8" strokeLinecap="round" />
-      <path d="m20.5 12.2 3.6 3.2 2.8-3.9" fill="none" stroke="#A78BFA" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="7" cy="24" r="4" fill="#7C3AED" />
-      <circle cx="18" cy="8" r="4" fill="#A78BFA" />
+      <circle cx="16" cy="16" r="10" fill="none" stroke="#7C3AED" strokeWidth="2.4" />
+      <circle cx="16" cy="16" r="4" fill="#A78BFA" />
+      <path d="M16 2v6M16 24v6M2 16h6M24 16h6" stroke="#F59E0B" strokeWidth="2.4" strokeLinecap="round" />
     </svg>
   )
 }
@@ -191,7 +192,7 @@ function LessonPopup({ node, onClose, onContinue }) {
   )
 }
 
-function buildSections(tracks, progress) {
+function buildSections(tracks, progress, focusLessonIds) {
   const orderedTracks = tracks.length
     ? [...tracks].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
     : [{ slug: 'foundation', title: 'Foundation', id: 'foundation', display_order: 1 }]
@@ -205,6 +206,14 @@ function buildSections(tracks, progress) {
   const byId = new Map(sections.map((track) => [String(track.id), track]))
 
   progress.forEach((item, order) => {
+    const lessonId = item.lesson_id || item.id || item.lesson_slug
+    const shouldShow =
+      !focusLessonIds ||
+      focusLessonIds.has(String(lessonId)) ||
+      item.status === 'complete'
+
+    if (!shouldShow) return
+
     const track =
       bySlug.get(item.track_slug) ||
       bySlug.get(lessonTrackFallback[item.lesson_slug]) ||
@@ -212,7 +221,7 @@ function buildSections(tracks, progress) {
       sections[0]
 
     track.lessons.push({
-      id: item.lesson_id || item.id || item.lesson_slug,
+      id: lessonId,
       slug: item.lesson_slug || item.slug,
       title: item.lesson_title || item.title || 'Untitled Lesson',
       status: item.status || 'locked',
@@ -345,11 +354,11 @@ export default function Dashboard() {
   const [currentTrack, setCurrentTrack] = useState('Foundation')
   const [hasToken, setHasToken] = useState(true)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const [showPathFinder, setShowPathFinder] = useState(false)
-  const [pathLessonId, setPathLessonId] = useState('')
-  const [pathResult, setPathResult] = useState(null)
-  const [pathError, setPathError] = useState('')
-  const [pathLoading, setPathLoading] = useState(false)
+  const [showFocusModal, setShowFocusModal] = useState(false)
+  const [focusTrack, setFocusTrack] = useState(null)
+  const [focusLessonIds, setFocusLessonIds] = useState(null)
+  const [focusError, setFocusError] = useState('')
+  const [focusLoading, setFocusLoading] = useState('')
   const mainRef = useRef(null)
   const popupBoundaryRef = useRef(null)
 
@@ -387,7 +396,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  const sections = useMemo(() => buildSections(tracks, progress), [tracks, progress])
+  const sections = useMemo(() => buildSections(tracks, progress, focusLessonIds), [tracks, progress, focusLessonIds])
   const mapLayout = useMemo(() => buildMapLayout(sections), [sections])
 
   useEffect(() => {
@@ -452,24 +461,40 @@ export default function Dashboard() {
     return () => document.removeEventListener('click', closeMenus)
   }, [])
 
-  const findPath = async () => {
-    if (!pathLessonId.trim()) return
-    setPathLoading(true)
-    setPathError('')
-    setPathResult(null)
+  const selectFocusTrack = async (track) => {
+    setFocusLoading(track.slug)
+    setFocusError('')
 
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${API_BASE}/users/me/learning-path/${pathLessonId.trim()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.message || data.error || 'No path found')
-      setPathResult(data.learningPath || null)
-    } catch (pathFindError) {
-      setPathError(pathFindError.message || 'No path found. Complete foundation lessons first.')
+      const headers = { Authorization: `Bearer ${token}` }
+      const lessonsResponse = await fetch(`${API_BASE}/tracks/${track.slug}/lessons`, { headers })
+      const lessonsData = await lessonsResponse.json()
+      if (!lessonsResponse.ok) throw new Error(lessonsData.message || lessonsData.error || 'Could not load track lessons')
+
+      const firstLesson = (lessonsData.lessons || [])[0]
+      if (!firstLesson?.id) throw new Error('No lessons found for this track yet.')
+
+      const pathResponse = await fetch(`${API_BASE}/users/me/learning-path/${firstLesson.id}`, { headers })
+      const pathData = await pathResponse.json()
+      if (!pathResponse.ok) throw new Error(pathData.message || pathData.error || 'Could not build focus path')
+
+      const completedIds = progress
+        .filter((lesson) => lesson.status === 'complete')
+        .map((lesson) => String(lesson.lesson_id || lesson.id || lesson.lesson_slug))
+      const visibleIds = new Set([
+        String(firstLesson.id),
+        ...(pathData.learningPath || []).map((id) => String(id.lesson_id || id.id || id)),
+        ...completedIds,
+      ])
+
+      setFocusLessonIds(visibleIds)
+      setFocusTrack(track)
+      setShowFocusModal(false)
+    } catch (focusSelectError) {
+      setFocusError(focusSelectError.message || 'Could not enable focus mode')
     } finally {
-      setPathLoading(false)
+      setFocusLoading('')
     }
   }
 
@@ -524,15 +549,15 @@ export default function Dashboard() {
           <strong>Leaderboard</strong>
           <span>Top 100</span>
         </button>
-        <button type="button" className="nav-card">
+        <button type="button" className="nav-card" onClick={() => navigate('/vault')}>
           <SpellbookIcon />
           <strong>Vault</strong>
           <span>3 unlocked</span>
         </button>
-        <button type="button" className="nav-card" onClick={() => setShowPathFinder(true)}>
-          <PathFinderIcon />
-          <strong>Path Finder</strong>
-          <span>Find your route</span>
+        <button type="button" className="nav-card" onClick={() => setShowFocusModal(true)}>
+          <FocusIcon />
+          <strong>Focus Mode</strong>
+          <span>{focusTrack ? focusTrack.title : 'All lessons'}</span>
         </button>
       </aside>
 
@@ -620,34 +645,52 @@ export default function Dashboard() {
             <LessonPopup
               node={selectedLesson}
               onClose={() => setSelectedLesson(null)}
-              onContinue={(node) => navigate(`/lesson/${node.slug}/${node.stage}`)}
+              onContinue={(node) => navigate(`/lesson/${node.slug}/${node.stage}`, {
+                state: {
+                  replay: node.state === 'complete' || node.status === 'complete',
+                  lessonTitle: node.title,
+                },
+              })}
             />
           </div>
         )}
       </main>
-      {showPathFinder && (
-        <div className="path-finder-overlay" onClick={() => setShowPathFinder(false)}>
-          <div className="path-finder-modal" onClick={(event) => event.stopPropagation()}>
-            <button type="button" className="path-close" onClick={() => setShowPathFinder(false)}>X</button>
-            <h2>Path Finder</h2>
-            <p>Find the shortest path to any lesson</p>
-            <input
-              type="number"
-              value={pathLessonId}
-              onChange={(event) => setPathLessonId(event.target.value)}
-              placeholder="Enter lesson ID"
-            />
-            <button type="button" className="path-find-button" onClick={findPath} disabled={pathLoading}>
-              {pathLoading ? 'Finding...' : 'FIND PATH'}
+      {showFocusModal && (
+        <div className="focus-overlay" onClick={() => setShowFocusModal(false)}>
+          <div className="focus-modal" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="focus-close" onClick={() => setShowFocusModal(false)}>X</button>
+            <h2>Focus Mode</h2>
+            <p>Choose a track to show only the lessons that matter for that route.</p>
+            <div className="focus-track-list">
+              {[
+                { slug: 'foundation', title: 'Foundation' },
+                { slug: 'code-assistant', title: 'Code Assistant' },
+                { slug: 'email-writing', title: 'Email and Writing' },
+                { slug: 'decision-making', title: 'Decision Making' },
+              ].map((track) => (
+                <button
+                  type="button"
+                  key={track.slug}
+                  onClick={() => selectFocusTrack(track)}
+                  disabled={Boolean(focusLoading)}
+                >
+                  <span>{track.title}</span>
+                  <strong>{focusLoading === track.slug ? 'Loading...' : 'Focus'}</strong>
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="focus-clear"
+              onClick={() => {
+                setFocusTrack(null)
+                setFocusLessonIds(null)
+                setShowFocusModal(false)
+              }}
+            >
+              SHOW ALL LESSONS
             </button>
-            {pathError && <div className="path-message error">{pathError}</div>}
-            {pathResult && (
-              <div className="path-message">
-                {Array.isArray(pathResult) && pathResult.length > 0
-                  ? pathResult.map((item) => `Lesson ${item.lesson_id || item.id || item}`).join(' → ')
-                  : 'No path found. Complete foundation lessons first.'}
-              </div>
-            )}
+            {focusError && <div className="focus-message error">{focusError}</div>}
           </div>
         </div>
       )}
@@ -872,7 +915,7 @@ button {
   text-align: center;
 }
 
-.path-finder-overlay {
+.focus-overlay {
   position: fixed;
   inset: 0;
   z-index: 80;
@@ -881,9 +924,9 @@ button {
   background: rgba(0, 0, 0, 0.7);
 }
 
-.path-finder-modal {
+.focus-modal {
   position: relative;
-  width: 400px;
+  width: 440px;
   padding: 32px;
   color: ${palette.text};
   background: ${palette.chrome};
@@ -892,7 +935,7 @@ button {
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
 }
 
-.path-close {
+.focus-close {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -905,33 +948,57 @@ button {
   font-weight: 950;
 }
 
-.path-finder-modal h2 {
+.focus-modal h2 {
   margin: 0 0 6px;
   color: #FFFFFF;
   font-size: 20px;
 }
 
-.path-finder-modal p {
+.focus-modal p {
   margin: 0 0 20px;
   color: ${palette.muted};
   font-size: 13px;
 }
 
-.path-finder-modal input {
+.focus-track-list {
+  display: grid;
+  gap: 10px;
+}
+
+.focus-track-list button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  padding: 12px;
+  padding: 14px 16px;
   color: #FFFFFF;
+  cursor: pointer;
   background: ${palette.surface};
   border: 1px solid ${palette.border};
   border-radius: 8px;
+  text-align: left;
 }
 
-.path-finder-modal input:focus {
+.focus-track-list button:hover {
   border-color: #7C3AED;
-  outline: none;
 }
 
-.path-find-button {
+.focus-track-list button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.focus-track-list span {
+  font-weight: 900;
+}
+
+.focus-track-list strong {
+  color: ${palette.amber};
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.focus-clear {
   width: 100%;
   margin-top: 14px;
   padding: 12px;
@@ -943,12 +1010,7 @@ button {
   font-weight: 950;
 }
 
-.path-find-button:disabled {
-  cursor: wait;
-  opacity: 0.75;
-}
-
-.path-message {
+.focus-message {
   margin-top: 16px;
   color: #FFFFFF;
   background: ${palette.surface};
@@ -957,7 +1019,7 @@ button {
   line-height: 1.5;
 }
 
-.path-message.error {
+.focus-message.error {
   color: #F87171;
 }
 
@@ -1044,13 +1106,17 @@ button {
 .lesson-name-label {
   position: absolute;
   z-index: 7;
-  width: 260px;
+  width: 360px;
+  margin: 32px 0 16px;
+  padding-left: 12px;
   transform: translateX(-50%);
-  color: #FFFFFF;
-  font-size: 18px;
-  line-height: 22px;
-  font-weight: 950;
-  text-align: center;
+  color: #F1F0FF;
+  border-left: 3px solid #7C3AED;
+  font-size: 22px;
+  line-height: 27px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: left;
   text-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
 }
 
