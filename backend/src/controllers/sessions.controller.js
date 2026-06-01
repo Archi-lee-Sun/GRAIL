@@ -61,11 +61,13 @@ const startSession = async (req , res , next) => {
             return res.status(403).json({ error: 'Lesson is locked' });
         }
 
-        if(progress.current_stage !== stage){
+        const isReplayingCompletedStage = progress.status === 'complete' || progress.current_stage > stage;
+
+        if(!isReplayingCompletedStage && progress.current_stage !== stage){
             return res.status(403).json({error : 'mismatched stage'});
         }
         
-        if(progress.status === 'unlocked'){
+        if(!isReplayingCompletedStage && progress.status === 'unlocked'){
             await updateLessonStatus(userId, lesson.id, 'in_progress');
         }
 

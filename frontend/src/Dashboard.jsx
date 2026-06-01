@@ -258,7 +258,7 @@ function buildMapLayout(sections) {
   const islandX = 118
   const islandWidth = 544
   const nodeGap = 140
-  const titleGap = 48
+  const titleGap = 72
   let y = 104
   let globalLessonNumber = 1
 
@@ -472,7 +472,8 @@ export default function Dashboard() {
       const lessonsData = await lessonsResponse.json()
       if (!lessonsResponse.ok) throw new Error(lessonsData.message || lessonsData.error || 'Could not load track lessons')
 
-      const firstLesson = (lessonsData.lessons || [])[0]
+      const trackLessons = lessonsData.lessons || []
+      const firstLesson = trackLessons[0]
       if (!firstLesson?.id) throw new Error('No lessons found for this track yet.')
 
       const pathResponse = await fetch(`${API_BASE}/users/me/learning-path/${firstLesson.id}`, { headers })
@@ -483,8 +484,8 @@ export default function Dashboard() {
         .filter((lesson) => lesson.status === 'complete')
         .map((lesson) => String(lesson.lesson_id || lesson.id || lesson.lesson_slug))
       const visibleIds = new Set([
-        String(firstLesson.id),
         ...(pathData.learningPath || []).map((id) => String(id.lesson_id || id.id || id)),
+        ...trackLessons.map((lesson) => String(lesson.lesson_id || lesson.id || lesson.slug)),
         ...completedIds,
       ])
 
@@ -539,12 +540,12 @@ export default function Dashboard() {
       </header>
 
       <aside className="sidebar">
-        <button type="button" className="nav-card">
+        <button type="button" className="nav-card" onClick={() => navigate('/arena')}>
           <SwordsIcon />
           <strong>Arena</strong>
           <span>Challenge active</span>
         </button>
-        <button type="button" className="nav-card">
+        <button type="button" className="nav-card" onClick={() => navigate('/leaderboard')}>
           <PixelTrophyIcon />
           <strong>Leaderboard</strong>
           <span>Top 100</span>
@@ -648,6 +649,7 @@ export default function Dashboard() {
               onContinue={(node) => navigate(`/lesson/${node.slug}/${node.stage}`, {
                 state: {
                   replay: node.state === 'complete' || node.status === 'complete',
+                  isReplay: node.state === 'complete' || node.status === 'complete',
                   lessonTitle: node.title,
                 },
               })}
@@ -775,9 +777,9 @@ button {
   left: calc(140px + (100% - 140px) / 2);
   top: 18px;
   transform: translateX(-50%);
-  color: ${palette.text};
-  font-size: 16px;
-  font-weight: 800;
+  color: #F1F0FF;
+  font-size: 20px;
+  font-weight: 700;
   text-align: center;
 }
 
@@ -963,6 +965,27 @@ button {
 .focus-track-list {
   display: grid;
   gap: 10px;
+  max-height: 226px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.focus-track-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.focus-track-list::-webkit-scrollbar-track {
+  background: #142314;
+  border-radius: 999px;
+}
+
+.focus-track-list::-webkit-scrollbar-thumb {
+  background: #2D4A2D;
+  border-radius: 999px;
+}
+
+.focus-track-list::-webkit-scrollbar-thumb:hover {
+  background: #4D6A4D;
 }
 
 .focus-track-list button {
@@ -1107,11 +1130,8 @@ button {
   position: absolute;
   z-index: 7;
   width: 360px;
-  margin: 32px 0 16px;
-  padding-left: 12px;
   transform: translateX(-50%);
   color: #F1F0FF;
-  border-left: 3px solid #7C3AED;
   font-size: 22px;
   line-height: 27px;
   font-weight: 700;

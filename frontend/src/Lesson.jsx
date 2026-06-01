@@ -557,7 +557,7 @@ export default function Lesson() {
   const navigate = useNavigate()
   const location = useLocation()
   const stageNumber = Number(stage || 1)
-  const replayFromRoute = Boolean(location.state?.replay)
+  const replayFromRoute = Boolean(location.state?.isReplay || location.state?.replay)
   const [lessonTitle, setLessonTitle] = useState('Lesson')
   const [conceptMarkdown, setConceptMarkdown] = useState('')
   const [tasks, setTasks] = useState([])
@@ -610,6 +610,12 @@ export default function Lesson() {
         setConceptMarkdown(stageData.concept_markdown || '')
         if (stageNumber === 3 || stageNumber === 4) {
           const allTasks = stageData.tasks || []
+          if (replayFromRoute) {
+            setTasks(allTasks)
+            setAllAlreadyPassed(false)
+            setAlreadyPassedMessage('')
+            return
+          }
           const pendingTasks = allTasks.filter((task) => !task.already_passed)
           const alreadyPassedCount = allTasks.filter((task) => task.already_passed).length
 
@@ -673,7 +679,7 @@ export default function Lesson() {
         {loading && <div className="state-card">Loading...</div>}
         {!loading && isReplay && (
           <div className="replay-banner">
-            You already passed this stage. Practice mode is open, but XP will not be awarded.
+            Practice mode — XP will not be awarded for this stage
           </div>
         )}
         {!loading && error && (
