@@ -55,12 +55,19 @@ const createUser = async ({username , email , password_hash}) => {
 
 const initializeUserLessonProgress = async (userId) => {
     const query = `
+        WITH first_foundation_lesson AS (
+            SELECT id
+            FROM lessons
+            WHERE track_id = (SELECT id FROM tracks WHERE is_foundation = true)
+            ORDER BY display_order ASC
+            LIMIT 1
+        )
         INSERT INTO user_lesson_progress (user_id, lesson_id, status)
         SELECT
             $1,
             lessons.id,
             CASE
-                WHEN tracks.is_foundation = true AND lessons.display_order = 1 THEN 'unlocked'
+                WHEN lessons.id = (SELECT id FROM first_foundation_lesson) THEN 'unlocked'
                 ELSE 'locked'
             END
         FROM lessons

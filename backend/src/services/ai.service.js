@@ -32,7 +32,7 @@ const gradeStage3 = async (userPrompt, referenceOutput, scenarioContext) => {
     try {
 
         const runPromptResponse = await groqClient.chat.completions.create({
-            model: "llama3-8b-8192",
+            model: "llama-3.3-70b-versatile",
             messages: [
                 {role : "system" , content: 'You are a helpful assistant. Complete the task given to you'},
                 {role : "user" , content : `Scenario: ${scenarioContext}\n\nPrompt: ${userPrompt}`}
@@ -73,7 +73,7 @@ const gradeStage3 = async (userPrompt, referenceOutput, scenarioContext) => {
         `;
 
         const gradingResponse = await groqClient.chat.completions.create({
-            model: "llama3-8b-8192",
+            model: "llama-3.3-70b-versatile",
             messages: [
                 {role : "system" , content : gradingPrompt},
                 {role : "user" , content : `Reference output: ${referenceOutput}\n\nUser output: ${userOutput}`}
@@ -107,7 +107,7 @@ const gradeStage4 = async (userPrompt, scenario, rubricHints) => {
     try {
         const runPromptSystem = `You are a helpful AI assistant. Your job is to complete the task given to you as accurately and thoroughly as possible. Follow the instructions in the user's prompt precisely.`;
         const runPromptResponse = await groqClient.chat.completions.create({
-            model: "llama3-8b-8192",
+            model: "llama-3.3-70b-versatile",
             messages : [
                 {role : "system" , content : runPromptSystem},
                 {role : "user" , content : `prompt : ${userPrompt}`}
@@ -163,7 +163,7 @@ const gradeStage4 = async (userPrompt, scenario, rubricHints) => {
         `;
 
         const gradingResponse = await groqClient.chat.completions.create({
-            model: "llama3-8b-8192",
+            model: "llama-3.3-70b-versatile",
             messages : [
                 {role : "system" , content : gradingPrompt},
                 {role : "user" , content : `Scenario: ${scenario}\n\nStudent's prompt: ${userPrompt}\n\nOutput generated: ${userOutput}\n\nRubric hints: ${rubricHints}`}

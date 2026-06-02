@@ -102,10 +102,13 @@ function SpellbookIcon() {
 
 function FocusIcon() {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-      <circle cx="16" cy="16" r="10" fill="none" stroke="#7C3AED" strokeWidth="2.4" />
-      <circle cx="16" cy="16" r="4" fill="#A78BFA" />
-      <path d="M16 2v6M16 24v6M2 16h6M24 16h6" stroke="#F59E0B" strokeWidth="2.4" strokeLinecap="round" />
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="14" y1="24" x2="14" y2="14" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="14" cy="13" r="2" fill="#9CA3AF" />
+      <line x1="14" y1="13" x2="7" y2="6" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="14" y1="13" x2="21" y2="6" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="7" cy="5" r="2.5" fill="#9CA3AF" />
+      <circle cx="21" cy="5" r="2.5" fill="#F59E0B" />
     </svg>
   )
 }
@@ -205,7 +208,13 @@ function buildSections(tracks, progress, focusLessonIds) {
   const bySlug = new Map(sections.map((track) => [track.slug, track]))
   const byId = new Map(sections.map((track) => [String(track.id), track]))
 
-  progress.forEach((item, order) => {
+  const sortedProgress = [...progress].sort((a, b) => {
+    const trackOrderDelta = Number(a.track_display_order || 0) - Number(b.track_display_order || 0)
+    if (trackOrderDelta !== 0) return trackOrderDelta
+    return Number(a.display_order || 0) - Number(b.display_order || 0)
+  })
+
+  sortedProgress.forEach((item, order) => {
     const lessonId = item.lesson_id || item.id || item.lesson_slug
     const shouldShow =
       !focusLessonIds ||
@@ -258,7 +267,7 @@ function buildMapLayout(sections) {
   const islandX = 118
   const islandWidth = 544
   const nodeGap = 140
-  const titleGap = 72
+  const titleGap = 51
   let y = 104
   let globalLessonNumber = 1
 
@@ -298,8 +307,9 @@ function buildMapLayout(sections) {
       islands.push({
         id: lesson.slug || `${section.slug}-${globalLessonNumber}`,
         lessonId: lesson.id,
+        title: lesson.title,
         x: islandX,
-        y: islandTop,
+        y: titleY,
         width: islandWidth,
         height: islandHeight,
       })
@@ -361,6 +371,7 @@ export default function Dashboard() {
   const [focusLoading, setFocusLoading] = useState('')
   const mainRef = useRef(null)
   const popupBoundaryRef = useRef(null)
+  const trackSentinelRefs = useRef({})
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -388,7 +399,13 @@ export default function Dashboard() {
         const tracksData = await tracksResponse.json()
 
         setUser(dashboardData.user)
-        setProgress(dashboardData.progress || [])
+        const sortedProgress = [...(dashboardData.progress || [])].sort((a, b) => {
+          const trackOrderDelta = Number(a.track_display_order || 0) - Number(b.track_display_order || 0)
+          if (trackOrderDelta !== 0) return trackOrderDelta
+          return Number(a.display_order || 0) - Number(b.display_order || 0)
+        })
+
+        setProgress(sortedProgress)
         setTracks(tracksData.tracks || [])
         setCurrentTrack((tracksData.tracks || [])[0]?.title || 'Foundation')
       })
@@ -400,28 +417,59 @@ export default function Dashboard() {
   const mapLayout = useMemo(() => buildMapLayout(sections), [sections])
 
   useEffect(() => {
+    if (sections[0]?.title) setCurrentTrack(sections[0].title)
+  }, [sections])
+
+  useEffect(() => {
     const main = mainRef.current
-    if (!main) return
+    if (!main || !sections.length) return undefined
 
-    const updateTrack = () => {
-      const viewportTop = main.getBoundingClientRect().top
-      let best = { title: currentTrack, visible: -Infinity }
+    const pickTrackFromSentinels = () => {
+      const sentinels = Object.values(trackSentinelRefs.current).filter(Boolean)
+      const mainTop = main.getBoundingClientRect().top
+      let active = null
 
-      main.querySelectorAll('[data-track-title]').forEach((section) => {
-        const rect = section.getBoundingClientRect()
-        const visible = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, viewportTop)
-        if (visible > best.visible) {
-          best = { title: section.dataset.trackTitle, visible }
+      sentinels.forEach((sentinel) => {
+        const rect = sentinel.getBoundingClientRect()
+        const distanceFromTop = rect.top - mainTop
+        if (distanceFromTop <= 80) {
+          if (!active || distanceFromTop > active.distanceFromTop) {
+            active = { title: sentinel.dataset.track, distanceFromTop }
+          }
         }
       })
 
-      if (best.title) setCurrentTrack(best.title)
+      if (!active) {
+        const firstVisible = sentinels
+          .map((sentinel) => ({
+            title: sentinel.dataset.track,
+            distanceFromTop: sentinel.getBoundingClientRect().top - mainTop,
+          }))
+          .filter((sentinel) => sentinel.distanceFromTop >= 0)
+          .sort((a, b) => a.distanceFromTop - b.distanceFromTop)[0]
+        active = firstVisible || { title: sections[0]?.title }
+      }
+
+      if (active?.title) setCurrentTrack(active.title)
     }
 
-    updateTrack()
-    main.addEventListener('scroll', updateTrack, { passive: true })
-    return () => main.removeEventListener('scroll', updateTrack)
-  }, [sections, currentTrack])
+    const observer = new IntersectionObserver(
+      () => pickTrackFromSentinels(),
+      { threshold: 0, root: main, rootMargin: '-80px 0px 0px 0px' },
+    )
+
+    Object.values(trackSentinelRefs.current).forEach((sentinel) => {
+      if (sentinel) observer.observe(sentinel)
+    })
+
+    pickTrackFromSentinels()
+    main.addEventListener('scroll', pickTrackFromSentinels, { passive: true })
+
+    return () => {
+      observer.disconnect()
+      main.removeEventListener('scroll', pickTrackFromSentinels)
+    }
+  }, [sections])
 
   useEffect(() => {
     if (!progress || progress.length === 0) return
@@ -557,7 +605,7 @@ export default function Dashboard() {
         </button>
         <button type="button" className="nav-card" onClick={() => setShowFocusModal(true)}>
           <FocusIcon />
-          <strong>Focus Mode</strong>
+          <strong>Track Filter</strong>
           <span>{focusTrack ? focusTrack.title : 'All lessons'}</span>
         </button>
       </aside>
@@ -575,16 +623,24 @@ export default function Dashboard() {
           <div className="skill-map" style={{ minHeight: `${mapLayout.mapHeight}px` }} onClick={() => setSelectedLesson(null)}>
             {mapLayout.islands.map((island) => (
               <div
-                className="lesson-island"
+                className="lesson-island-group"
                 key={island.id}
                 id={`lesson-${island.lessonId}`}
                 style={{
                   left: `${island.x}px`,
                   top: `${island.y}px`,
                   width: `${island.width}px`,
-                  height: `${island.height}px`,
                 }}
-              />
+              >
+                <div className="lesson-name-label">{island.title}</div>
+                <div
+                  className="lesson-island"
+                  style={{
+                    width: `${island.width}px`,
+                    height: `${island.height}px`,
+                  }}
+                />
+              </div>
             ))}
 
             <svg className="path-layer" viewBox={`0 0 780 ${mapLayout.mapHeight}`} preserveAspectRatio="none" aria-hidden="true">
@@ -613,14 +669,15 @@ export default function Dashboard() {
             </svg>
 
             {mapLayout.trackRegions.map((region) => (
-              <section
-                className="track-section"
-                data-track={region.slug}
-                data-track-title={region.title}
-                key={region.slug || region.title}
+              <div
+                className="track-sentinel"
+                data-track={region.title}
+                key={`track-sentinel-${region.slug || region.title}`}
+                ref={(element) => {
+                  if (element) trackSentinelRefs.current[region.slug || region.title] = element
+                }}
                 style={{
                   top: `${region.y}px`,
-                  height: `${region.height}px`,
                 }}
               />
             ))}
@@ -631,16 +688,6 @@ export default function Dashboard() {
                 node={node}
                 onSelect={setSelectedLesson}
               />
-            ))}
-
-            {mapLayout.lessonLabels.map((label) => (
-              <div
-                className="lesson-name-label"
-                key={`${label.title}-${label.y}`}
-                style={{ top: `${label.y}px`, left: `${label.x}px` }}
-              >
-                {label.title}
-              </div>
             ))}
 
             <LessonPopup
@@ -661,7 +708,7 @@ export default function Dashboard() {
         <div className="focus-overlay" onClick={() => setShowFocusModal(false)}>
           <div className="focus-modal" onClick={(event) => event.stopPropagation()}>
             <button type="button" className="focus-close" onClick={() => setShowFocusModal(false)}>X</button>
-            <h2>Focus Mode</h2>
+            <h2>Track Filter</h2>
             <p>Choose a track to show only the lessons that matter for that route.</p>
             <div className="focus-track-list">
               {[
@@ -677,7 +724,7 @@ export default function Dashboard() {
                   disabled={Boolean(focusLoading)}
                 >
                   <span>{track.title}</span>
-                  <strong>{focusLoading === track.slug ? 'Loading...' : 'Focus'}</strong>
+                  <strong>{focusLoading === track.slug ? 'Loading...' : 'Select'}</strong>
                 </button>
               ))}
             </div>
@@ -1075,8 +1122,14 @@ button {
   pointer-events: none;
 }
 
-.lesson-island {
+.lesson-island-group {
   position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lesson-island {
+  position: relative;
   z-index: 1;
   background: ${palette.chrome};
   border: 1px solid ${palette.border};
@@ -1085,10 +1138,11 @@ button {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
-.track-section {
+.track-sentinel {
   position: absolute;
   left: 0;
   width: 100%;
+  height: 1px;
   pointer-events: none;
 }
 
@@ -1127,16 +1181,16 @@ button {
 }
 
 .lesson-name-label {
-  position: absolute;
+  position: relative;
   z-index: 7;
-  width: 360px;
-  transform: translateX(-50%);
+  width: 100%;
+  margin-bottom: 24px;
   color: #F1F0FF;
   font-size: 22px;
   line-height: 27px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  text-align: left;
+  text-align: center;
   text-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
 }
 

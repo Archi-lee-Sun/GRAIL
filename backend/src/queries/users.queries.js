@@ -18,11 +18,20 @@ const getUserById = async (id) => {
 
 const getUserProgress = async (userId) => {
     const query = `
-        SELECT ulp.* , l.slug AS lesson_slug , l.title AS lesson_title
+        SELECT
+            ulp.*,
+            l.slug AS lesson_slug,
+            l.title AS lesson_title,
+            l.display_order,
+            t.id AS track_id,
+            t.slug AS track_slug,
+            t.title AS track_title,
+            t.display_order AS track_display_order
         FROM user_lesson_progress ulp
         JOIN lessons l ON ulp.lesson_id = l.id
+        JOIN tracks t ON l.track_id = t.id
         WHERE ulp.user_id = $1
-        ORDER BY l.display_order ASC
+        ORDER BY t.display_order ASC, l.display_order ASC
     `
     const values = [userId]
     try {

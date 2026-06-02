@@ -29,6 +29,6 @@
     "description": "Use AI as a thinking partner for complex decisions and strategy.",
     "is_foundation": false,
     "unlock_after_lesson_count": 15,
-    "display_order": 5
+    "display_order": 4
   }
 ]

@@ -57,6 +57,12 @@ const seed = async () => {
         }
 
         for (const task of tasks) {
+            if (!lessonMap[task.lesson_slug]) {
+                console.warn(`WARNING: task references unknown lesson_slug "${task.lesson_slug}" — skipping`);
+            }
+        }
+
+        for (const task of tasks) {
             const lessonId = lessonMap[task.lesson_slug];
             if (!lessonId) {
                 console.warn(`Skipping task: unknown lesson_slug "${task.lesson_slug}"`);
@@ -69,16 +75,40 @@ const seed = async () => {
             `, [task.stage, task.task_type, task.display_order, task.xp_reward, JSON.stringify(task.payload), lessonId]);
         }
 
-        await client.query(`
-            INSERT INTO lesson_dependencies (lesson_id, depends_on_id) VALUES
-            ($1, $2), ($3, $4), ($5, $6), ($7, $8)
-            ON CONFLICT DO NOTHING
-        `, [
-            lessonMap['anatomy-of-a-prompt'],   lessonMap['blank-page-problem'],
-            lessonMap['specificity-spectrum'],   lessonMap['anatomy-of-a-prompt'],
-            lessonMap['role-assignment'],        lessonMap['specificity-spectrum'],
-            lessonMap['context-injection'],      lessonMap['role-assignment'],
-        ]);
+        const dependencyPairs = [
+            ['anatomy-of-a-prompt', 'blank-page-problem'],
+            ['specificity-spectrum', 'anatomy-of-a-prompt'],
+            ['role-assignment', 'specificity-spectrum'],
+            ['context-injection', 'role-assignment'],
+            ['output-contracts', 'context-injection'],
+            ['code-review-prompts', 'debugging-with-ai'],
+            ['test-generation', 'code-review-prompts'],
+            ['refactoring-prompts', 'test-generation'],
+            ['architecture-tradeoffs', 'refactoring-prompts'],
+            ['tone-calibration', 'audience-and-intent'],
+            ['executive-summaries', 'tone-calibration'],
+            ['difficult-messages', 'executive-summaries'],
+            ['editing-for-clarity', 'difficult-messages'],
+            ['assumption-mapping', 'decision-framing'],
+            ['tradeoff-analysis', 'assumption-mapping'],
+            ['scenario-planning', 'tradeoff-analysis'],
+            ['premortems-red-teams', 'scenario-planning'],
+        ];
+
+        for (const [child, parent] of dependencyPairs) {
+            if (!lessonMap[child]) {
+                console.warn(`Missing lesson: ${child}`);
+                continue;
+            }
+            if (!lessonMap[parent]) {
+                console.warn(`Missing lesson: ${parent}`);
+                continue;
+            }
+            await client.query(
+                `INSERT INTO lesson_dependencies (lesson_id, depends_on_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+                [lessonMap[child], lessonMap[parent]]
+            );
+        }
 
         let vaultInserted = 0;
         let vaultSkipped  = 0;

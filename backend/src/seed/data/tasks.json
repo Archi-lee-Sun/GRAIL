@@ -6,11 +6,11 @@
     "display_order": 1,
     "xp_reward": 5,
     "payload": {
-      "scenario": "You need help writing a cover letter for a junior backend developer role.",
-      "prompt_a": "Write a cover letter for a junior backend developer applying to a fintech startup. I have experience with Node.js and PostgreSQL. Make it professional and impressive and really compelling and show my passion for technology and my eagerness to learn and grow in this field.",
-      "prompt_b": "Write a cover letter for a junior backend developer applying to a fintech startup. I have 8 months of experience with Node.js and PostgreSQL. The company values clean architecture and fast shipping. Under 250 words. Professional but not stiff. Do not use phrases like passionate about technology or eager to learn.",
+      "scenario": "You want AI to help you write a cold message to a startup CTO.",
+      "prompt_a": "Write a powerful and impressive LinkedIn message to a CTO about my backend projects.",
+      "prompt_b": "Write a LinkedIn message to a startup CTO. Context: I am a freshman CS student with 3 backend projects in Node/Postgres. Goal: ask for 15 minutes of feedback, not a job. Keep it under 90 words and avoid phrases like passionate or dream opportunity.",
       "correct": "b",
-      "explanation": "Both are long. B wins because every word adds a real constraint. A is filler length — it adds words without reducing blank page."
+      "explanation": "The stronger prompt is the one that makes useful constraints explicit instead of relying on decorative filler. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
     }
   },
   {
@@ -20,9 +20,9 @@
     "display_order": 2,
     "xp_reward": 5,
     "payload": {
-      "statement": "Adding adjectives like amazing, detailed, and comprehensive to your prompt makes the output better.",
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves useful constraints undefined.",
       "correct": false,
-      "explanation": "Adjectives describe your wish for the output without telling AI how to achieve it. They add length without reducing blank page."
+      "explanation": "False. Impressive adjectives are not a substitute for useful constraints. They change vibe more than correctness."
     }
   },
   {
@@ -32,52 +32,68 @@
     "display_order": 3,
     "xp_reward": 5,
     "payload": {
-      "prompt": "Give me ideas.",
+      "prompt": "Write me something about productivity.",
       "options": [
-        { "text": "It is too short", "mistake_category": "length" },
-        { "text": "It gives AI no subject, no context, no format, and no purpose", "mistake_category": "vague" },
-        { "text": "AI cannot generate ideas", "mistake_category": "wrong_assumption" },
-        { "text": "It does not say please", "mistake_category": "irrelevant" }
-      ],
-      "correct_index": 1,
-      "explanation": "Length is not the problem. The problem is total absence of information — every dimension is blank."
-    }
-  },
-  {
-    "lesson_slug": "blank-page-problem",
-    "stage": 2,
-    "task_type": "rank",
-    "display_order": 4,
-    "xp_reward": 5,
-    "payload": {
-      "scenario": "You want AI to explain how JWT authentication works.",
-      "prompts": [
-        "Explain JWT.",
-        "Explain JWT authentication like I am a backend developer who understands HTTP and sessions but has never implemented token-based auth. Focus on the flow: how tokens are created, sent, and verified. Use a short Node.js code example.",
-        "Can you tell me about JWT authentication and how it works in web apps, maybe with some details about implementation if possible?"
-      ],
-      "correct_order": [0, 2, 1],
-      "explanation": "Prompt 0 is pure blank page. Prompt 2 adds some context but maybe and if possible signal optional so AI may ignore them. Prompt 1 is precise — audience, scope, format, language all defined."
-    }
-  },
-  {
-    "lesson_slug": "blank-page-problem",
-    "stage": 2,
-    "task_type": "fill_blank",
-    "display_order": 5,
-    "xp_reward": 5,
-    "payload": {
-      "template": "Write a tweet about __.",
-      "blank_marker": "__",
-      "scenario": "You are announcing GRAIL — a prompt engineering learning app — to developers on X.",
-      "options": [
-        "something interesting in tech",
-        "my new app",
-        "a new desktop app that teaches prompt engineering through interactive lessons, aimed at CS students and developers, casual tone, under 240 characters, include a hook that creates curiosity",
-        "my app, make it good"
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves useful constraints undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
       ],
       "correct_index": 2,
-      "explanation": "Every other option still contains blank page. Option 2 specifies product, audience, tone, length constraint, and the emotional goal of the tweet."
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about useful constraints, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: The Blank Page Problem.",
+      "prompts": [
+        "Write me something about productivity, but make it useful for a real project.",
+        "Write me something about productivity.",
+        "Write a 180-word LinkedIn post for burned-out junior developers explaining why deliberate breaks improve output. Use a calm, evidence-aware tone. Avoid hustle-culture language."
+      ],
+      "correct_order": [
+        1,
+        0,
+        2
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about useful constraints. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "blank-page-problem",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about productivity writing.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes.",
+        "Define useful constraints; specify success criteria; remove decorative filler; and return the answer in a checkable structure."
+      ],
+      "correct_index": 3,
+      "explanation": "The correct option gives operational instructions tied to useful constraints. The other options sound nice but do not strongly constrain correctness."
     }
   },
   {
@@ -87,10 +103,15 @@
     "display_order": 6,
     "xp_reward": 10,
     "payload": {
-      "scenario_context": "A student needs to understand recursion for a CS course.",
-      "reference_output": "Recursion is when a function calls itself to solve a smaller version of the same problem.\n\nThink of it like Russian nesting dolls. Each doll opens to reveal a smaller identical doll inside, until you reach one that does not open — that is your base case.\n\nfunction countdown(n) {\n  if (n === 0) return;\n  console.log(n);\n  countdown(n - 1);\n}\n\nThe function keeps calling itself with n-1 until it hits zero. Without a base case it calls itself forever — stack overflow.",
-      "reference_prompt": "Explain recursion to someone who understands basic programming but has never seen a function call itself. Use a real-world analogy first, then show a simple JavaScript example. Make sure to explain what a base case is and what happens without one.",
-      "evaluation_criteria": ["non-technical audience specified", "analogy requested", "code example requested", "base case coverage requested"]
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about productivity writing while demonstrating The Blank Page Problem.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies useful constraints, then returns a structured result with explicit boundaries. It avoids decorative filler and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for productivity writing. The prompt must explicitly use useful constraints, prevent decorative filler, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses useful constraints as an explicit part of the prompt",
+        "Prevents or reduces decorative filler",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
     }
   },
   {
@@ -100,10 +121,15 @@
     "display_order": 7,
     "xp_reward": 10,
     "payload": {
-      "scenario_context": "Someone wants practical sleep improvement advice.",
-      "reference_output": "3 things that will actually improve your sleep:\n\n1. No screens 45 minutes before bed — blue light delays melatonin by up to 3 hours\n2. Keep your room at 18C — your body needs to drop core temperature to initiate deep sleep\n3. Same wake time every day including weekends — your circadian rhythm does not understand days off\n\nWhat does not work: melatonin supplements, counting sheep, sleeping in on weekends.",
-      "reference_prompt": "Give me exactly 3 science-backed sleep tips in a numbered list. Each tip should include the reason why it works. Add a short section at the end on what does not work. Be direct, no fluff.",
-      "evaluation_criteria": ["numbered list format specified", "science-backed requirement", "specific number of tips", "what does not work section requested"]
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'The Blank Page Problem'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'The Blank Page Problem', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better useful constraints.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to useful constraints"
+      ]
     }
   },
   {
@@ -113,8 +139,8 @@
     "display_order": 8,
     "xp_reward": 15,
     "payload": {
-      "scenario": "You are a CS student applying for your first remote backend developer job. You have built three projects — a bookmark manager, a quiz app, and a mood tracking app with a global map. Write a prompt that asks AI to help you write a cold outreach message to a startup CTO on LinkedIn. The message should not sound like every other cold message they receive.",
-      "rubric_hints": "Should define tone, length, what to avoid, target recipient context, and include a clear call to action. Should not use vague adjectives as instructions."
+      "scenario": "You are using AI for a serious real-world task involving productivity writing. Write the actual prompt you would send. It must demonstrate mastery of 'The Blank Page Problem' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include useful constraints; should avoid decorative filler; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
     }
   },
   {
@@ -124,557 +150,2877 @@
     "display_order": 1,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You need a markdown README for a Python script that scrapes GitHub repositories.",
-    "prompt_a": "Write a README for a Python scraper script.",
-    "prompt_b": "Act as a technical writer. Write a markdown README for a Python GitHub scraper. Include sections for Installation, Usage, and Configuration. Constraint: Keep the usage instructions under 3 steps.",
-    "correct": "b",
-    "explanation": "Prompt B wins because it explicitly defines all four essential parts: context (technical writer), instruction (write a markdown README), format (sections for Installation, Usage, Configuration), and constraints (under 3 steps)."
+      "scenario": "You need AI to create documentation for a small Python CLI tool.",
+      "prompt_a": "Write documentation for my CLI tool. Make it complete and professional.",
+      "prompt_b": "Act as a technical writer. Write a Markdown README for a Python CLI named logclean. Include Installation, Usage, Options, and Troubleshooting. Keep examples copy-pasteable.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes context, instruction, format, constraints explicit instead of relying on component confusion. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "anatomy-of-a-prompt",
     "stage": 2,
     "task_type": "true_false",
     "display_order": 2,
     "xp_reward": 5,
     "payload": {
-    "statement": "Every effective engineering prompt must contain all four core components: context, instruction, format, and constraints.",
-    "correct": false,
-    "explanation": "False. While knowing all four parts helps you diagnose weak prompts, simple or highly focused tasks often succeed with just instructions and constraints without needing explicit role context or strict formatting."
+      "statement": "A strong prompt for this lesson should make context, instruction, format, constraints visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and context, instruction, format, constraints gives it a standard to follow."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "anatomy-of-a-prompt",
     "stage": 2,
     "task_type": "whats_wrong",
     "display_order": 3,
     "xp_reward": 5,
     "payload": {
-    "prompt": "Review my JavaScript function for performance bottlenecks: \n\njavascript\nfunction processData(arr) {\n  let result = [];\n  for (let i = 0; i < arr.length; i++) {\n    if (!result.includes(arr[i])) result.push(arr[i]);\n  }\n  return result;\n}\n",
-    "options": [
-    {
-    "text": "The prompt is too long for the LLM to parse effectively.",
-    "mistake_category": "length"
-    },
-    {
-    "text": "The prompt lacks a specific format and structural constraints for the feedback.",
-    "mistake_category": "vague"
-    },
-    {
-    "text": "The prompt assumes the AI cannot read JavaScript.",
-    "mistake_category": "wrong_assumption"
-    },
-    {
-    "text": "The code snippet provided is completely irrelevant to the review instruction.",
-    "mistake_category": "irrelevant"
+      "prompt": "Review this API.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves context, instruction, format, constraints undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 1,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about context, instruction, format, constraints, so the answer may be fluent but misaligned."
     }
-    ],
-    "correct_index": 1,
-    "explanation": "The prompt has clear context and instruction, but it lacks structural constraints and format components. Without specifying how the output should look, the AI might give a long, conversational essay instead of a structured, actionable code review."
-    }
-    },
-    {
+  },
+  {
     "lesson_slug": "anatomy-of-a-prompt",
     "stage": 2,
     "task_type": "rank",
     "display_order": 4,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You want to explain how an API works to a non-technical product manager.",
-    "prompts": [
-    "Explain APIs.",
-    "Explain APIs to our non-technical product manager. Focus on how data travels between the frontend and backend. Format your answer as a 3-bullet analogy without technical jargon.",
-    "Explain what an API is to a product manager."
-    ],
-    "correct_order": [0, 2, 1],
-    "explanation": "Prompt 0 is the worst because it has no parts except a raw instruction. Prompt 2 is in the middle as it adds context (product manager). Prompt 1 is the best because it integrates context, clear instructions, thematic focus, and strict formatting/jargon constraints."
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Anatomy of a Prompt.",
+      "prompts": [
+        "Act as a senior backend reviewer. Review this Express API route for security and reliability. Return: 3 risks, why each matters, and a safer code pattern. Do not rewrite unrelated code.",
+        "Review this API.",
+        "Review this API, but make it useful for a real project."
+      ],
+      "correct_order": [
+        1,
+        2,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about context, instruction, format, constraints. The weakest prompt leaves the model to invent the task shape."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "anatomy-of-a-prompt",
     "stage": 2,
     "task_type": "fill_blank",
     "display_order": 5,
     "xp_reward": 5,
     "payload": {
-    "template": "Write a script that automates Git commits. ",
-    "blank_marker": "__",
-    "scenario": "You need a shell script to automate regular git workflows, but want to make sure it handles errors properly.",
-    "options": [
-    "Make it work well.",
-    "Use Bash syntax.",
-    "Output a Bash script. If a git command fails, the script must exit immediately and log the error to a file named error.log.",
-    "Write it step by step."
-    ],
-    "correct_index": 2,
-    "explanation": "Option 2 is the only choice that provides both a distinct format component (Bash script) and actionable constraint components (exit immediately on error, log to error.log), which transforms a vague instruction into a production-ready template."
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about technical review.",
+      "options": [
+        "Define context, instruction, format, constraints; specify success criteria; remove component confusion; and return the answer in a checkable structure.",
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 0,
+      "explanation": "The correct option gives operational instructions tied to context, instruction, format, constraints. The other options sound nice but do not strongly constrain correctness."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "anatomy-of-a-prompt",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 6,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You are generating documentation for a React component library and need a highly structured documentation layout snippet.",
-    "reference_output": "### Card Component\n\nA UI container used to group related content.\n\n#### Props\n- title (string): The header text.\n- elevation (number): Shadow depth from 1 to 5.\n\n#### Usage\ntsx\n<Card title=\"Hello\" elevation={2} />\n",
-    "reference_prompt": "Act as a frontend documentarian. Document a React component named Card that takes title and elevation props. Use markdown with headings for Component Name, Props, and Usage. Ensure the usage example uses TSX formatting.",
-    "evaluation_criteria": [
-    "Explicitly states the role or context of a frontend documentarian",
-    "Includes structural components like specific markdown headings",
-    "Contains clear instructions detailing the component name and exact props",
-    "Imposes constraints requiring TSX syntax highlighting in the example"
-    ]
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about technical review while demonstrating Anatomy of a Prompt.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies context, instruction, format, constraints, then returns a structured result with explicit boundaries. It avoids component confusion and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for technical review. The prompt must explicitly use context, instruction, format, constraints, prevent component confusion, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses context, instruction, format, constraints as an explicit part of the prompt",
+        "Prevents or reduces component confusion",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "anatomy-of-a-prompt",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 7,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You need to write an onboarding checklist email for a newly hired junior developer joining your engineering team.",
-    "reference_output": "A semantic section element with id 'contributions' containing an h2 heading and contribution cards, each card has a title, description paragraph, and an anchor link with class btn-link.",
-    "reference_prompt": "Write an onboarding email to a junior developer. Format it with a subject line and a numbered list containing exactly 3 distinct setup tasks. Constraint: Do not include any external links or HR jargon.",
-    "evaluation_criteria": [
-    "Specifies the exact target audience context of a junior developer",
-    "Instructs the AI to format the response with a subject line and numbered list",
-    "Applies a numerical constraint of exactly 3 distinct tasks",
-    "Imposes an exclusion constraint banning external links and HR jargon"
-    ]
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Anatomy of a Prompt'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Anatomy of a Prompt', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better context, instruction, format, constraints.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to context, instruction, format, constraints"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "anatomy-of-a-prompt",
     "stage": 4,
     "task_type": "free_build",
     "display_order": 8,
     "xp_reward": 15,
     "payload": {
-    "scenario": "You are a senior DevOps engineer mentoring an intern. Write a prompt that instructs an AI to generate a docker-compose setup for a Node.js app and a PostgreSQL database. The prompt must explicitly leverage all 4 parts of anatomy: context (who the AI is), instruction (what to build), format (how the output should look), and constraints (production-safety guidelines like avoiding plain text passwords).",
-    "rubric_hints": "context of devops engineer or mentor, instruction to create docker-compose for node and postgres, format specifying code block and explanations, constraints regarding environment variables or safety"
+      "scenario": "You are using AI for a serious real-world task involving technical review. Write the actual prompt you would send. It must demonstrate mastery of 'Anatomy of a Prompt' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include context, instruction, format, constraints; should avoid component confusion; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 2,
     "task_type": "which_better",
     "display_order": 1,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You want to find performance issues in a PostgreSQL query execution plan.",
-    "prompt_a": "Look at this EXPLAIN plan and tell me why it is running slow.",
-    "prompt_b": "Analyze this PostgreSQL EXPLAIN ANALYZE text. Identify any Sequential Scans on tables with more than 10,000 rows, list the top 2 highest-cost nodes, and recommend specific indexes to add.",
-    "correct": "b",
-    "explanation": "Prompt B replaces the vague query 'why it is running slow' with hyper-specific metrics: isolating sequential scans, a row threshold, a top-2 limit, and an explicit deliverable (indexes)."
+      "scenario": "You want AI to generate mock data for a dashboard.",
+      "prompt_a": "Generate realistic dashboard data with many useful fields and make it good.",
+      "prompt_b": "Generate 8 JSON objects for a SaaS dashboard. Each object must contain accountId, plan, mrr, churnRisk, lastLoginAt, and openTickets. Use ISO dates and no nested arrays.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes verifiable specificity explicit instead of relying on vague adjectives. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 2,
     "task_type": "true_false",
     "display_order": 2,
     "xp_reward": 5,
     "payload": {
-    "statement": "Making a prompt highly specific always means making it significantly longer and wordier.",
-    "correct": false,
-    "explanation": "False. Specificity is about precision, not length. Swapping a generic word like 'code' for a precise term like 'idempotent Express middleware' increases specificity without inflating prompt length."
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves verifiable specificity undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for verifiable specificity. They change vibe more than correctness."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 2,
     "task_type": "whats_wrong",
     "display_order": 3,
     "xp_reward": 5,
     "payload": {
-    "prompt": "Write some test cases for my Python user authentication login function so that it doesn't break in production.",
-    "options": [
-    {
-    "text": "The prompt should be written in Python instead of conversational English.",
-    "mistake_category": "length"
-    },
-    {
-    "text": "The instruction is vague; it fails to specify the testing framework, edge cases to target, or output format.",
-    "mistake_category": "vague"
-    },
-    {
-    "text": "The prompt wrongly assumes that Python functions require production servers to test.",
-    "mistake_category": "wrong_assumption"
-    },
-    {
-    "text": "The phrase 'user authentication login' is entirely irrelevant to writing unit tests.",
-    "mistake_category": "irrelevant"
+      "prompt": "Make this code better.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves verifiable specificity undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        }
+      ],
+      "correct_index": 3,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about verifiable specificity, so the answer may be fluent but misaligned."
     }
-    ],
-    "correct_index": 1,
-    "explanation": "The problem lies in the vague instructions. Phrases like 'some test cases' and 'so that it doesn't break' don't tell the AI whether you want pytest unit tests, integration tests, or specific boundary checks like empty strings or SQL injection inputs."
-    }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 2,
     "task_type": "rank",
     "display_order": 4,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You need dummy JSON data to mock a user profile service in your app.",
-    "prompts": [
-    "Give me a JSON payload representing a mock user account.",
-    "Generate a JSON array containing exactly 3 mock user objects. Each object must have fields for id (UUIDv4), username (string), and creationDate (ISO 8601 string). Do not include any extra nesting.",
-    "Create mock user JSON data containing an ID, username, and sign up date."
-    ],
-    "correct_order": [0, 2, 1],
-    "explanation": "Prompt 0 is extremely vague. Prompt 2 adds basic field requirements. Prompt 1 sits at the peak of the specificity spectrum, explicitly detailing data structures, item counts, exact data types, and formatting shapes."
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: The Specificity Spectrum.",
+      "prompts": [
+        "Make this code better.",
+        "Refactor this JavaScript function to reduce time complexity from O(n²) to O(n) if possible. Preserve behavior, explain the data structure used, and include one before/after complexity note.",
+        "Make this code better, but make it useful for a real project."
+      ],
+      "correct_order": [
+        0,
+        2,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about verifiable specificity. The weakest prompt leaves the model to invent the task shape."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 2,
     "task_type": "fill_blank",
     "display_order": 5,
     "xp_reward": 5,
     "payload": {
-    "template": "Write a short technical explanation of WebSocket connections .",
-    "blank_marker": "__",
-    "scenario": "You need an explanation of WebSockets tailored for a system design interview context.",
-    "options": [
-    "that sounds good and smart",
-    "for someone who doesn't know much about servers",
-    "limited to 150 words, focusing purely on the persistent full-duplex TCP connection handshake compared to traditional HTTP polling",
-    "and make it detailed"
-    ],
-    "correct_index": 2,
-    "explanation": "Option 2 sharply narrows the specificity spectrum by introducing explicit technical terms (full-duplex TCP, handshake, HTTP polling) and an exact constraint metric (150 words)."
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about code improvement.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Define verifiable specificity; specify success criteria; remove vague adjectives; and return the answer in a checkable structure.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 2,
+      "explanation": "The correct option gives operational instructions tied to verifiable specificity. The other options sound nice but do not strongly constrain correctness."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 6,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You want to generate an optimized CSS layout descriptor without generic properties.",
-    "reference_output": "A flexible container utilizing CSS Flexbox. It aligns items horizontally along the main axis with space distributed evenly between them. When the screen width drops below 600px, the container direction flips to vertical.",
-    "reference_prompt": "Explain how to structure a responsive CSS layout using Flexbox. Focus on horizontal alignment with space-between distribution, and explicitly detail a media query breakpoint at 600px that changes the flow to column.",
-    "evaluation_criteria": [
-    "Specifies the exact layout engine to use, which is Flexbox",
-    "Identifies precise alignment mechanics like horizontal space-between distribution",
-    "Defines a quantitative responsive breakpoint metric at exactly 600px",
-    "Details the specific structural structural shift to a column direction"
-    ]
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about code improvement while demonstrating The Specificity Spectrum.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies verifiable specificity, then returns a structured result with explicit boundaries. It avoids vague adjectives and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for code improvement. The prompt must explicitly use verifiable specificity, prevent vague adjectives, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses verifiable specificity as an explicit part of the prompt",
+        "Prevents or reduces vague adjectives",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 7,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You need to generate an error message strategy for a failing API call due to rate limiting.",
-    "reference_output": "Status Code: 429 Too Many Requests\nMessage: Rate limit exceeded. You have made too many API calls in a short window.\nRetry-After Header: 30 seconds",
-    "reference_prompt": "Write a specific HTTP error handling payload configuration for a rate-limiting scenario. Include the exact 429 status code, a descriptive message, and a Retry-After header constraint set to 30 seconds.",
-    "evaluation_criteria": [
-    "Targets the specific failure mode of rate limiting",
-    "Specifies the precise numeric HTTP status code 429",
-    "Mandates the inclusion of a concrete response string description",
-    "Demands the exact configuration of a Retry-After header set to 30 seconds"
-    ]
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'The Specificity Spectrum'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'The Specificity Spectrum', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better verifiable specificity.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to verifiable specificity"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "specificity-spectrum",
     "stage": 4,
     "task_type": "free_build",
     "display_order": 8,
     "xp_reward": 15,
     "payload": {
-    "scenario": "You are writing a script to parse logs but need an AI to write a regex pattern for you. Write a highly specific prompt that asks for a regular expression. The prompt must avoid vague terms and instead supply specific parameters: the exact log format to match (e.g., ISO timestamp, followed by log level INFO/ERROR, followed by a message), what parts should be captured using named capture groups, and language constraints (e.g., Python re module).",
-    "rubric_hints": "exact log format description, specify named capture groups, python re module constraint, avoid vague terms like match logs"
+      "scenario": "You are using AI for a serious real-world task involving code improvement. Write the actual prompt you would send. It must demonstrate mastery of 'The Specificity Spectrum' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include verifiable specificity; should avoid vague adjectives; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 2,
     "task_type": "which_better",
     "display_order": 1,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You want to find security issues in a piece of smart contract code written in Solidity.",
-    "prompt_a": "Check this Solidity smart contract code for security bugs.",
-    "prompt_b": "Act as an expert Web3 security auditor. Review this Solidity smart contract specifically searching for reentrancy vulnerabilities and integer overflow bugs. Provide technical recommendations for remediation.",
-    "correct": "b",
-    "explanation": "Prompt B successfully applies role assignment. By establishing the persona of a 'Web3 security auditor', it signals the AI to adopt a highly technical, critical mindset looking for industry-specific attack vectors like reentrancy."
+      "scenario": "You want feedback on an onboarding flow for a developer education app.",
+      "prompt_a": "Act as a famous Silicon Valley genius. Tell me if my onboarding is amazing.",
+      "prompt_b": "Act as a skeptical UX researcher specializing in learning products. Find where a beginner developer may feel confused, bored, or unsure what to click next.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes domain-appropriate persona explicit instead of relying on empty prestige role. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 2,
     "task_type": "true_false",
     "display_order": 2,
     "xp_reward": 5,
     "payload": {
-    "statement": "Assigning a persona changes how the model processes information primarily by modifying its tone, vocabulary selection, and professional perspective.",
-    "correct": true,
-    "explanation": "True. Personas tap into specific subsets of training data, directly influencing word choice, level of technical depth, underlying assumptions, and the framing of solutions."
+      "statement": "A strong prompt for this lesson should make domain-appropriate persona visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and domain-appropriate persona gives it a standard to follow."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 2,
     "task_type": "whats_wrong",
     "display_order": 3,
     "xp_reward": 5,
     "payload": {
-    "prompt": "You are a software engineer. Explain what a compiler does to someone who doesn't know anything about computers.",
-    "options": [
-    {
-    "text": "The prompt is too short to invoke a deep linguistic behavioral change in the model.",
-    "mistake_category": "length"
-    },
-    {
-    "text": "The assigned persona is too generic; 'software engineer' doesn't align closely enough with the target non-technical audience explanation goal.",
-    "mistake_category": "vague"
-    },
-    {
-    "text": "Compilers cannot be explained without advanced mathematics software concepts.",
-    "mistake_category": "wrong_assumption"
-    },
-    {
-    "text": "The concept of software engineering is completely irrelevant when talking about hardware compilers.",
-    "mistake_category": "irrelevant"
+      "prompt": "Act as a genius and explain databases.",
+      "options": [
+        {
+          "text": "It fails because it leaves domain-appropriate persona undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 0,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about domain-appropriate persona, so the answer may be fluent but misaligned."
     }
-    ],
-    "correct_index": 1,
-    "explanation": "The persona 'software engineer' is too broad. To explain a highly specialized topic to an absolute beginner, assigning a more specific persona like 'A high school computer science teacher who excels at using simple real-world analogies' would guide the vocabulary much more effectively."
-    }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 2,
     "task_type": "rank",
     "display_order": 4,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You want constructive feedback on your app's user onboarding sequence flow.",
-    "prompts": [
-    "Look at my app onboarding sequence and tell me what you think.",
-    "Act as a critical UX researcher who specializes in mobile product adoption. Evaluate this onboarding flow description and highlight points of friction where users are likely to drop off.",
-    "Imagine you are a product manager checking out an app onboarding screen."
-    ],
-    "correct_order": [0, 2, 1],
-    "explanation": "Prompt 0 completely lacks a persona. Prompt 2 gives a loose, generic role. Prompt 1 provides a hyper-targeted, expert persona ('UX researcher specializing in mobile product adoption') which directly triggers a specialized analytical perspective."
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Role Assignment.",
+      "prompts": [
+        "Act as a genius and explain databases, but make it useful for a real project.",
+        "Act as a database teacher for first-year CS students. Explain indexes using a library-catalog analogy, then show one SQL example and one case where an index can hurt.",
+        "Act as a genius and explain databases."
+      ],
+      "correct_order": [
+        2,
+        0,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about domain-appropriate persona. The weakest prompt leaves the model to invent the task shape."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 2,
     "task_type": "fill_blank",
     "display_order": 5,
     "xp_reward": 5,
     "payload": {
-    "template": "Act as a . Review my code architecture proposal and suggest edge cases where horizontal scaling will break down.",
-    "blank_marker": "__",
-    "scenario": "You want to spot architectural flaws in a distributed system before writing code.",
-    "options": [
-    "person who writes software code",
-    "junior developer trying to learn databases",
-    "principal distributed systems architect with 15 years of infrastructure experience",
-    "tech startup founder pitching to venture capitalists"
-    ],
-    "correct_index": 2,
-    "explanation": "Option 2 injects a highly authoritative, domain-expert persona that forces the model to look past superficial syntax and analyze underlying deep systemic bottlenecks like network partitions or data consistency."
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about teaching databases.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Define domain-appropriate persona; specify success criteria; remove empty prestige role; and return the answer in a checkable structure.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 1,
+      "explanation": "The correct option gives operational instructions tied to domain-appropriate persona. The other options sound nice but do not strongly constrain correctness."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 6,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You need an answer from the perspective of an aggressive, detail-oriented QA engineer uncovering critical edge-case bugs.",
-    "reference_output": "Bug Report: The registration form fails silently when a user enters a username exactly 256 characters long. \n\nSeverity: High. \nSteps to Reproduce: Input a 256-character string into the name field and submit. \nExpected behavior: Validation error banner displayed. \nActual behavior: Form spins infinitely with no network resolution.",
-    "reference_prompt": "Act as a meticulous QA engineer. Write a professional bug report for a registration form that freezes when processing extreme boundary inputs. Structure it with clear blocks for Severity, Steps, Expected, and Actual behaviors.",
-    "evaluation_criteria": [
-    "Assigns a precise persona of a QA engineer or tester",
-    "Adopts the formal, clinical tone expected of an issue tracking bug report",
-    "Focuses on technical testing edge cases such as boundary inputs",
-    "Structures the output cleanly into explicit QA analytical fields"
-    ]
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about teaching databases while demonstrating Role Assignment.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies domain-appropriate persona, then returns a structured result with explicit boundaries. It avoids empty prestige role and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for teaching databases. The prompt must explicitly use domain-appropriate persona, prevent empty prestige role, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses domain-appropriate persona as an explicit part of the prompt",
+        "Prevents or reduces empty prestige role",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 7,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You need an engineering manager's diplomatic rejection letter to a candidate who had great soft skills but missed critical systemic edge cases during a coding interview.",
-    "reference_output": "Thank you for taking the time to interview with us. We appreciated your collaborative communication style during the pair programming exercise. However, we have decided not to move forward. Our team requires deep foundational experience with concurrent systems design, and your solution lacked edge-case handling for high-throughput race conditions.",
-    "reference_prompt": "Act as an empathetic but firm engineering manager. Write a brief rejection letter to a developer candidate. Praise their communication but explicitly state they lacked the concurrent systems design depth required for the role.",
-    "evaluation_criteria": [
-    "Implements the specific organizational persona of an engineering manager",
-    "Balances empathy with firm professional boundaries",
-    "Pinpoints a highly explicit technical reason for the rejection",
-    "Maintains a corporate communication tone tailored for interview candidates"
-    ]
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Role Assignment'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Role Assignment', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better domain-appropriate persona.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to domain-appropriate persona"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "role-assignment",
     "stage": 4,
     "task_type": "free_build",
     "display_order": 8,
     "xp_reward": 15,
     "payload": {
-    "scenario": "You are preparing for a difficult technical behavioral interview at a top tech company. Write a prompt that commands the AI to act as an uncompromising, senior technical interviewer. The prompt must establish a distinct persona, instruct the AI to ask you one challenging system design question at a time, wait for your response, and critique your answers harshly from a perspective of scalability, cost efficiency, and fault tolerance.",
-    "rubric_hints": "persona of a senior technical interviewer, behavior directive to ask one question at a time, interactive simulation rules, analytical evaluation metrics like cost or scalability"
+      "scenario": "You are using AI for a serious real-world task involving teaching databases. Write the actual prompt you would send. It must demonstrate mastery of 'Role Assignment' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include domain-appropriate persona; should avoid empty prestige role; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 2,
     "task_type": "which_better",
     "display_order": 1,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You are trying to resolve an deployment issue with a service on your company's internal cluster infrastructure.",
-    "prompt_a": "Why is my application crashing on startup during deployment?",
-    "prompt_b": "My Node.js application is crashing on startup when deployed to an on-premise Kubernetes cluster. It runs perfectly locally on Docker Mac. Here are the last 3 lines of logs: OOMKilled, Exit Code 137.",
-    "correct": "b",
-    "explanation": "Prompt B wins because it injects critical situational background context (on-premise Kubernetes vs local Docker environment) and exact execution artifacts (OOMKilled logs) that the AI would have no way of guessing otherwise."
+      "scenario": "You want SQL optimization help.",
+      "prompt_a": "Optimize this query: SELECT * FROM users JOIN orders ON users.id = orders.user_id;",
+      "prompt_b": "PostgreSQL 15, users has 80k rows, orders has 3.2M rows, indexes exist on users.id and orders.user_id. This query is slow only when filtering orders.status='pending'. Analyze likely bottlenecks and ask for missing EXPLAIN data if needed.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes situational facts explicit instead of relying on hidden background. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 2,
     "task_type": "true_false",
     "display_order": 2,
     "xp_reward": 5,
     "payload": {
-    "statement": "Large language models retain background context about your specific hardware setup, programming goals, and team architecture across separate chat sessions.",
-    "correct": false,
-    "explanation": "False. LLMs are completely stateless between distinct chat sessions. They have zero memory of your personal situation, tech stack configurations, or constraints unless you actively inject that context into every prompt window."
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves situational facts undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for situational facts. They change vibe more than correctness."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 2,
     "task_type": "whats_wrong",
     "display_order": 3,
     "xp_reward": 5,
     "payload": {
-    "prompt": "Optimize this database query for speed:\nSELECT * FROM users JOIN orders ON users.id = orders.user_id WHERE orders.status = 'pending';",
-    "options": [
-    {
-    "text": "The raw SQL code provided contains massive structural syntax bugs.",
-    "mistake_category": "length"
-    },
-    {
-    "text": "The prompt fails to inject critical system context, such as the database engine type, table schemas, index states, or target data volumes.",
-    "mistake_category": "vague"
-    },
-    {
-    "text": "The prompt assumes the model already knows the passwords to your private databases.",
-    "mistake_category": "wrong_assumption"
-    },
-    {
-    "text": "The SELECT statement syntax is completely irrelevant to standard optimization rules.",
-    "mistake_category": "irrelevant"
+      "prompt": "Why is my deployment broken?",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves situational facts undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 1,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about situational facts, so the answer may be fluent but misaligned."
     }
-    ],
-    "correct_index": 1,
-    "explanation": "An LLM cannot reliably optimize database queries in isolation. Without injected situational context regarding whether this is running on PostgreSQL or MySQL, what indexes currently exist, and whether the tables hold 100 rows or 50 million rows, the optimization advice will be generic and potentially counterproductive."
-    }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 2,
     "task_type": "rank",
     "display_order": 4,
     "xp_reward": 5,
     "payload": {
-    "scenario": "You need to fix a broken layout bug in a React web application component.",
-    "prompts": [
-    "Fix my button layout bug.",
-    "My React button component is breaking layout alignment. I am using TailwindCSS. The button is placed inside a flex container but is stretching out of bounds. Here is the component markup: <div className='flex'><button className='w-full'>Click</button></div>",
-    "Fix the layout of a button that is breaking inside a web interface box container."
-    ],
-    "correct_order": [0, 2, 1],
-    "explanation": "Prompt 0 provides zero context. Prompt 2 gives very minimal framework hints. Prompt 1 successfully injects the entire environment context: the UI library (React), styling paradigm (TailwindCSS), parent container structure (flex layout), and precise inline code snippet."
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Context Injection.",
+      "prompts": [
+        "My Node.js API deploys successfully locally with Docker, but crashes on an AWS ECS Fargate task. Logs show Exit Code 137 and OOMKilled after importing a 500MB CSV. Task memory is 512MB. Explain likely causes and safe fixes.",
+        "Why is my deployment broken?, but make it useful for a real project.",
+        "Why is my deployment broken?"
+      ],
+      "correct_order": [
+        2,
+        1,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about situational facts. The weakest prompt leaves the model to invent the task shape."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 2,
     "task_type": "fill_blank",
     "display_order": 5,
     "xp_reward": 5,
     "payload": {
-    "template": "Write a deployment guide for my API service. ",
-    "blank_marker": "__",
-    "scenario": "You need a deployment runbook tailored specifically to your company's specialized hosting pipeline.",
-    "options": [
-    "Make it look corporate and professional.",
-    "Assume I am deploying it to a modern cloud hosting website.",
-    "Context: The service is a Python FastAPI app. We deploy it using GitHub Actions CI/CD pipelines pushing to an AWS ECS Fargate cluster with a PostgreSQL RDS instance.",
-    "Keep it simple so anyone can run it."
-    ],
-    "correct_index": 2,
-    "explanation": "Option 2 injects structural environmental context (FastAPI, GitHub Actions, AWS ECS Fargate, RDS), turning a generic task into a customized runtime template for your engineering reality."
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about deployment debugging.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Define situational facts; specify success criteria; remove hidden background; and return the answer in a checkable structure.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 2,
+      "explanation": "The correct option gives operational instructions tied to situational facts. The other options sound nice but do not strongly constrain correctness."
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 6,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You need to write a post-mortem incident report for an outage on a legacy platform with unique architectural dependencies.",
-    "reference_output": "Incident Post-Mortem\n\nContext: Our application serves 50,000 active legacy clients using a self-hosted Redis instance for session caching.\nRoot Cause: High traffic spike led to Redis exceeding its memory allocation limits, forcing eviction loops.\nResolution: Increased Redis cluster memory limits and implemented a circuit breaker pattern on the connection layer.",
-    "reference_prompt": "Write an incident post-mortem report. Inject the situational context that we serve 50,000 legacy clients using self-hosted Redis caching. Identify the root cause as a memory exhaustion eviction loop and note the resolution.",
-    "evaluation_criteria": [
-    "Explicitly states the operational scale context of 50,000 users",
-    "Includes the explicit architectural context of a self-hosted Redis instance",
-    "Details the structural breakdown cause of memory exhaustion eviction loops",
-    "Delineates the concrete resolution tracking items implemented"
-    ]
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about deployment debugging while demonstrating Context Injection.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies situational facts, then returns a structured result with explicit boundaries. It avoids hidden background and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for deployment debugging. The prompt must explicitly use situational facts, prevent hidden background, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses situational facts as an explicit part of the prompt",
+        "Prevents or reduces hidden background",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 3,
     "task_type": "reconstruction",
     "display_order": 7,
     "xp_reward": 10,
     "payload": {
-    "scenario_context": "You need to write an API migration notice to an integration partner team using an outdated authentication protocol.",
-    "reference_output": "Attention Partners: We are deprecating API v1 on October 1st. Your integration currently utilizes Basic Authentication, which will no longer be supported. To maintain service connectivity, you must update your middleware pipeline to pass OAuth2 Bearer Tokens instead. Please consult the attached migration checklist.",
-    "reference_prompt": "Write an API deprecation announcement for integration partners. Explicitly inject the context that they are currently using Basic Auth on API v1, specify an October 1st deadline, and give concrete instructions to switch to OAuth2 Bearer Tokens.",
-    "evaluation_criteria": [
-    "Injects the specific integration system state context of Basic Auth usage",
-    "Provides a clear business landscape context timeline with an October 1st deadline",
-    "Names the exact targeted replacement authentication protocol of OAuth2",
-    "Addresses the external integration partner engineering audience context directly"
-    ]
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Context Injection'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Context Injection', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better situational facts.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to situational facts"
+      ]
     }
-    },
-    {
+  },
+  {
     "lesson_slug": "context-injection",
     "stage": 4,
     "task_type": "free_build",
     "display_order": 8,
     "xp_reward": 15,
     "payload": {
-    "scenario": "Your legacy Python application is running unacceptably slow, but you can't just rewrite it. Write a prompt requesting performance optimization advice. You must inject comprehensive situational context that a human team member would need: the specific language and framework version, the operating environment constraints, database integration setups, historical bottlenecks you've already verified, and the absolute business boundaries (e.g., zero budget for upgrading server hardware).",
-    "rubric_hints": "inject explicit framework or language versions, specify database or environment landscape context, list historical testing parameters or bottlenecks, detail strict resource or hardware budget boundaries"
+      "scenario": "You are using AI for a serious real-world task involving deployment debugging. Write the actual prompt you would send. It must demonstrate mastery of 'Context Injection' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include situational facts; should avoid hidden background; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
     }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need AI to compare two backend hosting options.",
+      "prompt_a": "Compare Render and AWS for my backend and tell me which is better.",
+      "prompt_b": "Compare Render and AWS ECS for a student Node/Postgres app. Return a decision matrix with cost, deployment complexity, learning value, reliability, and final recommendation. Score each 1-5 and explain only scores that differ by 2+.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes checkable deliverable explicit instead of relying on open-ended answer shape. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
     }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make checkable deliverable visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and checkable deliverable gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Give me feedback on this resume.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves checkable deliverable undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 2,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about checkable deliverable, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Output Contracts.",
+      "prompts": [
+        "Give me feedback on this resume, but make it useful for a real project.",
+        "Give me feedback on this resume.",
+        "Review this resume for a junior backend role. Return a table with columns: Issue, Why it hurts, Rewrite. Give exactly 7 issues. Do not comment on design unless it affects readability."
+      ],
+      "correct_order": [
+        1,
+        0,
+        2
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about checkable deliverable. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about resume review.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes.",
+        "Define checkable deliverable; specify success criteria; remove open-ended answer shape; and return the answer in a checkable structure."
+      ],
+      "correct_index": 3,
+      "explanation": "The correct option gives operational instructions tied to checkable deliverable. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about resume review while demonstrating Output Contracts.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies checkable deliverable, then returns a structured result with explicit boundaries. It avoids open-ended answer shape and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for resume review. The prompt must explicitly use checkable deliverable, prevent open-ended answer shape, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses checkable deliverable as an explicit part of the prompt",
+        "Prevents or reduces open-ended answer shape",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Output Contracts'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Output Contracts', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better checkable deliverable.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to checkable deliverable"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "output-contracts",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving resume review. Write the actual prompt you would send. It must demonstrate mastery of 'Output Contracts' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include checkable deliverable; should avoid open-ended answer shape; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Your Express route returns 401 even with a valid token.",
+      "prompt_a": "Fix my auth route. It keeps saying unauthorized.",
+      "prompt_b": "Debug why this Express protected route returns 401. Expected: valid JWT grants access. Actual: req.user is undefined. Context: token is sent in Authorization: Bearer header, middleware order is app.use('/api', auth, routes). Show the most likely failure points before suggesting code.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes evidence and reproduction explicit instead of relying on unsupported guessing. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves evidence and reproduction undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for evidence and reproduction. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "My React app is broken. Fix it.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves evidence and reproduction undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        }
+      ],
+      "correct_index": 3,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about evidence and reproduction, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Debugging With AI.",
+      "prompts": [
+        "Debug this React login form. Expected: submit sends POST /api/auth/login once. Actual: request fires twice in development. Context: React 18 StrictMode is enabled. Here is the component. Identify likely causes before changing code.",
+        "My React app is broken. Fix it.",
+        "My React app is broken. Fix it, but make it useful for a real project."
+      ],
+      "correct_order": [
+        1,
+        2,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about evidence and reproduction. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about bug diagnosis.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Define evidence and reproduction; specify success criteria; remove unsupported guessing; and return the answer in a checkable structure.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 1,
+      "explanation": "The correct option gives operational instructions tied to evidence and reproduction. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about bug diagnosis while demonstrating Debugging With AI.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies evidence and reproduction, then returns a structured result with explicit boundaries. It avoids unsupported guessing and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for bug diagnosis. The prompt must explicitly use evidence and reproduction, prevent unsupported guessing, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses evidence and reproduction as an explicit part of the prompt",
+        "Prevents or reduces unsupported guessing",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Debugging With AI'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Debugging With AI', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better evidence and reproduction.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to evidence and reproduction"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "debugging-with-ai",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving bug diagnosis. Write the actual prompt you would send. It must demonstrate mastery of 'Debugging With AI' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include evidence and reproduction; should avoid unsupported guessing; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You want feedback on a database access layer.",
+      "prompt_a": "Act as a PostgreSQL performance reviewer. Inspect this repository function for N+1 queries, missing transactions, unsafe dynamic SQL, and connection leaks. Rank findings by production risk.",
+      "prompt_b": "Review this database code and make it cleaner, smarter, and more professional.",
+      "correct": "a",
+      "explanation": "The stronger prompt is the one that makes risk-focused review explicit instead of relying on generic code polishing. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make risk-focused review visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and risk-focused review gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Review my code and improve it.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves risk-focused review undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 1,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about risk-focused review, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Code Review Prompts.",
+      "prompts": [
+        "Review my code and improve it.",
+        "Review this password reset endpoint as a security reviewer. Focus only on token leakage, enumeration, expiry, replay, and rate-limiting. Return findings by severity with a concrete patch for each high-risk issue.",
+        "Review my code and improve it, but make it useful for a real project."
+      ],
+      "correct_order": [
+        0,
+        2,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about risk-focused review. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about security code review.",
+      "options": [
+        "Define risk-focused review; specify success criteria; remove generic code polishing; and return the answer in a checkable structure.",
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 0,
+      "explanation": "The correct option gives operational instructions tied to risk-focused review. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about security code review while demonstrating Code Review Prompts.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies risk-focused review, then returns a structured result with explicit boundaries. It avoids generic code polishing and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for security code review. The prompt must explicitly use risk-focused review, prevent generic code polishing, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses risk-focused review as an explicit part of the prompt",
+        "Prevents or reduces generic code polishing",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Code Review Prompts'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Code Review Prompts', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better risk-focused review.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to risk-focused review"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "code-review-prompts",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving security code review. Write the actual prompt you would send. It must demonstrate mastery of 'Code Review Prompts' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include risk-focused review; should avoid generic code polishing; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need tests for a login endpoint.",
+      "prompt_a": "Write many good tests for my login API so it does not break.",
+      "prompt_b": "Write Jest + Supertest tests for POST /login. Cover valid credentials, wrong password, missing email, malformed email, SQL-injection-like input, and rate-limit response after 5 failures. Mock only the email service.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes edge-case coverage explicit instead of relying on happy-path-only tests. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves edge-case coverage undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for edge-case coverage. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Write tests for this function.",
+      "options": [
+        {
+          "text": "It fails because it leaves edge-case coverage undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 0,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about edge-case coverage, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Test Generation.",
+      "prompts": [
+        "Write tests for this function, but make it useful for a real project.",
+        "Write pytest tests for this slugify(text) function. Cover empty input, Unicode accents, repeated spaces, punctuation-only strings, and idempotence. Do not mock the function under test. Return only test code.",
+        "Write tests for this function."
+      ],
+      "correct_order": [
+        2,
+        0,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about edge-case coverage. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about unit testing.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes.",
+        "Define edge-case coverage; specify success criteria; remove happy-path-only tests; and return the answer in a checkable structure."
+      ],
+      "correct_index": 3,
+      "explanation": "The correct option gives operational instructions tied to edge-case coverage. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about unit testing while demonstrating Test Generation.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies edge-case coverage, then returns a structured result with explicit boundaries. It avoids happy-path-only tests and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for unit testing. The prompt must explicitly use edge-case coverage, prevent happy-path-only tests, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses edge-case coverage as an explicit part of the prompt",
+        "Prevents or reduces happy-path-only tests",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Test Generation'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Test Generation', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better edge-case coverage.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to edge-case coverage"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "test-generation",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving unit testing. Write the actual prompt you would send. It must demonstrate mastery of 'Test Generation' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include edge-case coverage; should avoid happy-path-only tests; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You want to refactor a large controller.",
+      "prompt_a": "Rewrite this controller in a cleaner way and improve its logic.",
+      "prompt_b": "Refactor this Express controller without changing HTTP status codes, JSON response shape, or database query semantics. Extract validation and business logic into pure functions, then list any behavior you intentionally did not change.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes behavior preservation explicit instead of relying on style-only rewriting. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make behavior preservation visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and behavior preservation gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Refactor this into better code.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves behavior preservation undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 2,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about behavior preservation, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Refactoring Prompts.",
+      "prompts": [
+        "Refactor this Node service to separate validation, persistence, and response mapping. Preserve public API behavior and error messages exactly. After the code, list behavior-preservation checks.",
+        "Refactor this into better code, but make it useful for a real project.",
+        "Refactor this into better code."
+      ],
+      "correct_order": [
+        2,
+        1,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about behavior preservation. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about backend refactoring.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Define behavior preservation; specify success criteria; remove style-only rewriting; and return the answer in a checkable structure.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 2,
+      "explanation": "The correct option gives operational instructions tied to behavior preservation. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about backend refactoring while demonstrating Refactoring Prompts.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies behavior preservation, then returns a structured result with explicit boundaries. It avoids style-only rewriting and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for backend refactoring. The prompt must explicitly use behavior preservation, prevent style-only rewriting, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses behavior preservation as an explicit part of the prompt",
+        "Prevents or reduces style-only rewriting",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Refactoring Prompts'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Refactoring Prompts', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better behavior preservation.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to behavior preservation"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "refactoring-prompts",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving backend refactoring. Write the actual prompt you would send. It must demonstrate mastery of 'Refactoring Prompts' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include behavior preservation; should avoid style-only rewriting; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You are deciding whether to add Redis.",
+      "prompt_a": "Should I use Redis in my app? Give the best answer.",
+      "prompt_b": "Evaluate whether Redis is justified for a Node/Postgres quiz app with 500 daily users, leaderboard reads every 10 seconds, and simple session auth. Compare database-only, Redis cache, and materialized view approaches.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes contextual tradeoffs explicit instead of relying on architecture fashion. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves contextual tradeoffs undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for contextual tradeoffs. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Should I use microservices?",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves contextual tradeoffs undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 1,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about contextual tradeoffs, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Architecture Tradeoff Prompts.",
+      "prompts": [
+        "Should I use microservices?, but make it useful for a real project.",
+        "Should I use microservices?",
+        "Evaluate monolith vs modular monolith vs microservices for a 3-person student team building a Node/Postgres learning app. Traffic is under 1k DAU, deadline is 3 weeks, reliability matters less than shipping. Return a tradeoff matrix and recommendation."
+      ],
+      "correct_order": [
+        1,
+        0,
+        2
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about contextual tradeoffs. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about system design decisions.",
+      "options": [
+        "Define contextual tradeoffs; specify success criteria; remove architecture fashion; and return the answer in a checkable structure.",
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 0,
+      "explanation": "The correct option gives operational instructions tied to contextual tradeoffs. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about system design decisions while demonstrating Architecture Tradeoff Prompts.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies contextual tradeoffs, then returns a structured result with explicit boundaries. It avoids architecture fashion and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for system design decisions. The prompt must explicitly use contextual tradeoffs, prevent architecture fashion, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses contextual tradeoffs as an explicit part of the prompt",
+        "Prevents or reduces architecture fashion",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Architecture Tradeoff Prompts'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Architecture Tradeoff Prompts', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better contextual tradeoffs.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to contextual tradeoffs"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "architecture-tradeoffs",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving system design decisions. Write the actual prompt you would send. It must demonstrate mastery of 'Architecture Tradeoff Prompts' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include contextual tradeoffs; should avoid architecture fashion; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need to email a professor about missing a lab.",
+      "prompt_a": "Write a respectful email to my professor explaining I missed the lab because of illness, asking whether I can complete an alternative task, and keeping it under 120 words.",
+      "prompt_b": "Write a very polite and professional email about my unfortunate absence and make it convincing.",
+      "correct": "a",
+      "explanation": "The stronger prompt is the one that makes reader and desired action explicit instead of relying on generic politeness. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make reader and desired action visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and reader and desired action gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Write a professional email about the deadline.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves reader and desired action undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        }
+      ],
+      "correct_index": 3,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about reader and desired action, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Audience and Intent.",
+      "prompts": [
+        "Write an email to a busy professor asking for a 48-hour deadline extension. Intent: take responsibility, give one concrete reason, propose a new submission time, and avoid sounding entitled.",
+        "Write a professional email about the deadline.",
+        "Write a professional email about the deadline, but make it useful for a real project."
+      ],
+      "correct_order": [
+        1,
+        2,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about reader and desired action. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about academic email.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Define reader and desired action; specify success criteria; remove generic politeness; and return the answer in a checkable structure.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 1,
+      "explanation": "The correct option gives operational instructions tied to reader and desired action. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about academic email while demonstrating Audience and Intent.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies reader and desired action, then returns a structured result with explicit boundaries. It avoids generic politeness and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for academic email. The prompt must explicitly use reader and desired action, prevent generic politeness, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses reader and desired action as an explicit part of the prompt",
+        "Prevents or reduces generic politeness",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Audience and Intent'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Audience and Intent', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better reader and desired action.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to reader and desired action"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "audience-and-intent",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving academic email. Write the actual prompt you would send. It must demonstrate mastery of 'Audience and Intent' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include reader and desired action; should avoid generic politeness; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need to reject a request without damaging the relationship.",
+      "prompt_a": "Make my refusal kind, warm, nice, and friendly so they do not feel bad.",
+      "prompt_b": "Rewrite this refusal for a teammate. Tone: respectful and firm, not apologetic. Acknowledge their need once, state the boundary clearly, and offer one practical alternative.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes controlled tone explicit instead of relying on random niceness. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves controlled tone undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for controlled tone. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Make this sound nicer.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves controlled tone undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 2,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about controlled tone, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Tone Calibration.",
+      "prompts": [
+        "Make this sound nicer.",
+        "Rewrite this message to a teammate in a calm but firm tone. Preserve the boundary: the deadline cannot move. Remove blame, avoid apology overuse, and keep it under 130 words.",
+        "Make this sound nicer, but make it useful for a real project."
+      ],
+      "correct_order": [
+        0,
+        2,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about controlled tone. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about workplace communication.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes.",
+        "Define controlled tone; specify success criteria; remove random niceness; and return the answer in a checkable structure."
+      ],
+      "correct_index": 3,
+      "explanation": "The correct option gives operational instructions tied to controlled tone. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about workplace communication while demonstrating Tone Calibration.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies controlled tone, then returns a structured result with explicit boundaries. It avoids random niceness and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for workplace communication. The prompt must explicitly use controlled tone, prevent random niceness, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses controlled tone as an explicit part of the prompt",
+        "Prevents or reduces random niceness",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Tone Calibration'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Tone Calibration', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better controlled tone.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to controlled tone"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "tone-calibration",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving workplace communication. Write the actual prompt you would send. It must demonstrate mastery of 'Tone Calibration' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include controlled tone; should avoid random niceness; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need to summarize a bug report for leadership.",
+      "prompt_a": "Make this bug report shorter and more executive-friendly.",
+      "prompt_b": "Summarize this bug report for a CTO in exactly 5 bullets: business impact, affected users, root cause, current mitigation, decision needed. Avoid implementation details unless they change risk.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes decision-centered compression explicit instead of relying on flat summarization. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make decision-centered compression visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and decision-centered compression gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Summarize this report professionally.",
+      "options": [
+        {
+          "text": "It fails because it leaves decision-centered compression undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 0,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about decision-centered compression, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Executive Summaries.",
+      "prompts": [
+        "Summarize this report professionally, but make it useful for a real project.",
+        "Summarize this incident report for a CTO. Use 5 bullets: impact, root cause, customer risk, fix status, decision needed. Put the decision needed first if urgent.",
+        "Summarize this report professionally."
+      ],
+      "correct_order": [
+        2,
+        0,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about decision-centered compression. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about leadership summary.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Define decision-centered compression; specify success criteria; remove flat summarization; and return the answer in a checkable structure.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 2,
+      "explanation": "The correct option gives operational instructions tied to decision-centered compression. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about leadership summary while demonstrating Executive Summaries.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies decision-centered compression, then returns a structured result with explicit boundaries. It avoids flat summarization and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for leadership summary. The prompt must explicitly use decision-centered compression, prevent flat summarization, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses decision-centered compression as an explicit part of the prompt",
+        "Prevents or reduces flat summarization",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Executive Summaries'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Executive Summaries', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better decision-centered compression.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to decision-centered compression"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "executive-summaries",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving leadership summary. Write the actual prompt you would send. It must demonstrate mastery of 'Executive Summaries' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include decision-centered compression; should avoid flat summarization; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need to tell a project teammate their work cannot be merged.",
+      "prompt_a": "Write a message telling my teammate their code is bad but make it polite.",
+      "prompt_b": "Draft a message to a teammate explaining their PR cannot be merged today because tests fail and auth behavior changed. Tone: direct, respectful, solution-focused. Include next steps and avoid blaming language.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes direct truth with respect explicit instead of relying on avoidant softness. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves direct truth with respect undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for direct truth with respect. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Write a nice rejection email.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves direct truth with respect undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        }
+      ],
+      "correct_index": 3,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about direct truth with respect, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Difficult Messages.",
+      "prompts": [
+        "Write a rejection email to a strong candidate. Must be honest that we need more production backend experience, appreciative of their time, brief, and not falsely promising future opportunities.",
+        "Write a nice rejection email, but make it useful for a real project.",
+        "Write a nice rejection email."
+      ],
+      "correct_order": [
+        2,
+        1,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about direct truth with respect. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about rejection and conflict.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Define direct truth with respect; specify success criteria; remove avoidant softness; and return the answer in a checkable structure.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 1,
+      "explanation": "The correct option gives operational instructions tied to direct truth with respect. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about rejection and conflict while demonstrating Difficult Messages.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies direct truth with respect, then returns a structured result with explicit boundaries. It avoids avoidant softness and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for rejection and conflict. The prompt must explicitly use direct truth with respect, prevent avoidant softness, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses direct truth with respect as an explicit part of the prompt",
+        "Prevents or reduces avoidant softness",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Difficult Messages'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Difficult Messages', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better direct truth with respect.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to direct truth with respect"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "difficult-messages",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving rejection and conflict. Write the actual prompt you would send. It must demonstrate mastery of 'Difficult Messages' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include direct truth with respect; should avoid avoidant softness; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You want AI to polish a project update.",
+      "prompt_a": "Improve this update and make it sound like a professional manager wrote it.",
+      "prompt_b": "Edit this project update for clarity. Preserve every deadline, owner, and technical claim. Remove hedging, split long sentences, and flag any statement that sounds unsupported.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes meaning-preserving edits explicit instead of relying on fancy rewriting. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make meaning-preserving edits visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and meaning-preserving edits gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Improve this text.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves meaning-preserving edits undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 1,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about meaning-preserving edits, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Editing for Clarity.",
+      "prompts": [
+        "Improve this text, but make it useful for a real project.",
+        "Improve this text.",
+        "Edit this update for clarity and brevity. Preserve all dates, names, numbers, and commitments. Cut repetition. Return: revised version + 3 bullets explaining the biggest clarity changes."
+      ],
+      "correct_order": [
+        1,
+        0,
+        2
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about meaning-preserving edits. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about professional editing.",
+      "options": [
+        "Define meaning-preserving edits; specify success criteria; remove fancy rewriting; and return the answer in a checkable structure.",
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 0,
+      "explanation": "The correct option gives operational instructions tied to meaning-preserving edits. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about professional editing while demonstrating Editing for Clarity.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies meaning-preserving edits, then returns a structured result with explicit boundaries. It avoids fancy rewriting and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for professional editing. The prompt must explicitly use meaning-preserving edits, prevent fancy rewriting, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses meaning-preserving edits as an explicit part of the prompt",
+        "Prevents or reduces fancy rewriting",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Editing for Clarity'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Editing for Clarity', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better meaning-preserving edits.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to meaning-preserving edits"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "editing-for-clarity",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving professional editing. Write the actual prompt you would send. It must demonstrate mastery of 'Editing for Clarity' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include meaning-preserving edits; should avoid fancy rewriting; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You must choose what feature to build next.",
+      "prompt_a": "Tell me whether I should build Vault, Arena, or Profile next. Context: final demo in 4 days, backend endpoints exist for Vault/Arena, Profile is not required. Criteria: demo impact, implementation risk, and portfolio value.",
+      "prompt_b": "Which feature is best to build next? Think deeply and give me the smart answer.",
+      "correct": "a",
+      "explanation": "The stronger prompt is the one that makes objective and constraints explicit instead of relying on unframed choosing. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves objective and constraints undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for objective and constraints. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "What should I choose?",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves objective and constraints undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 2,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about objective and constraints, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Decision Framing.",
+      "prompts": [
+        "Help me decide between building a desktop Electron wrapper now or after submission. Objective: maximize project grade and portfolio value. Constraints: 5 days left, backend done, frontend missing Vault/Arena. Compare options and recommend a sequence.",
+        "What should I choose?",
+        "What should I choose?, but make it useful for a real project."
+      ],
+      "correct_order": [
+        1,
+        2,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about objective and constraints. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about project prioritization.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Define objective and constraints; specify success criteria; remove unframed choosing; and return the answer in a checkable structure.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 2,
+      "explanation": "The correct option gives operational instructions tied to objective and constraints. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about project prioritization while demonstrating Decision Framing.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies objective and constraints, then returns a structured result with explicit boundaries. It avoids unframed choosing and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for project prioritization. The prompt must explicitly use objective and constraints, prevent unframed choosing, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses objective and constraints as an explicit part of the prompt",
+        "Prevents or reduces unframed choosing",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Decision Framing'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Decision Framing', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better objective and constraints.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to objective and constraints"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "decision-framing",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving project prioritization. Write the actual prompt you would send. It must demonstrate mastery of 'Decision Framing' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include objective and constraints; should avoid unframed choosing; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You want to validate a YouTube content plan.",
+      "prompt_a": "Tell me if this YouTube idea will go viral and what I should do.",
+      "prompt_b": "Map assumptions behind this YouTube channel idea. Separate audience-demand assumptions, production-capacity assumptions, and monetization assumptions. Rank by risk and propose the cheapest test for each.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes high-impact uncertain assumptions explicit instead of relying on comforting validation. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make high-impact uncertain assumptions visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and high-impact uncertain assumptions gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Is my startup idea good?",
+      "options": [
+        {
+          "text": "It fails because it leaves high-impact uncertain assumptions undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 0,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about high-impact uncertain assumptions, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Assumption Mapping.",
+      "prompts": [
+        "Is my startup idea good?",
+        "Analyze this app idea by mapping assumptions. Create a table with assumption, why it matters, confidence, evidence needed, and cheapest test. Rank by high impact + low confidence.",
+        "Is my startup idea good?, but make it useful for a real project."
+      ],
+      "correct_order": [
+        0,
+        2,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about high-impact uncertain assumptions. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about startup validation.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes.",
+        "Define high-impact uncertain assumptions; specify success criteria; remove comforting validation; and return the answer in a checkable structure."
+      ],
+      "correct_index": 3,
+      "explanation": "The correct option gives operational instructions tied to high-impact uncertain assumptions. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about startup validation while demonstrating Assumption Mapping.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies high-impact uncertain assumptions, then returns a structured result with explicit boundaries. It avoids comforting validation and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for startup validation. The prompt must explicitly use high-impact uncertain assumptions, prevent comforting validation, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses high-impact uncertain assumptions as an explicit part of the prompt",
+        "Prevents or reduces comforting validation",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Assumption Mapping'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Assumption Mapping', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better high-impact uncertain assumptions.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to high-impact uncertain assumptions"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "assumption-mapping",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving startup validation. Write the actual prompt you would send. It must demonstrate mastery of 'Assumption Mapping' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include high-impact uncertain assumptions; should avoid comforting validation; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You need to choose between polishing UI and adding features.",
+      "prompt_a": "Compare UI polish vs adding more screens for my app. Weight final demo clarity 50%, implementation risk 30%, portfolio storytelling 20%. Include what I give up with each choice.",
+      "prompt_b": "Tell me if UI polish or more features is better for a final project.",
+      "correct": "a",
+      "explanation": "The stronger prompt is the one that makes weighted criteria explicit instead of relying on simple pro/con counting. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves weighted criteria undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for weighted criteria. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Compare these two options.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves weighted criteria undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 1,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about weighted criteria, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Tradeoff Analysis.",
+      "prompts": [
+        "Compare these two options, but make it useful for a real project.",
+        "Compare learning React deeply vs shipping the current app faster. Criteria weights: final grade 40%, portfolio signal 35%, long-term skill 25%. Include opportunity cost and recommendation.",
+        "Compare these two options."
+      ],
+      "correct_order": [
+        2,
+        0,
+        1
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about weighted criteria. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about student project choices.",
+      "options": [
+        "Define weighted criteria; specify success criteria; remove simple pro/con counting; and return the answer in a checkable structure.",
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 0,
+      "explanation": "The correct option gives operational instructions tied to weighted criteria. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about student project choices while demonstrating Tradeoff Analysis.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies weighted criteria, then returns a structured result with explicit boundaries. It avoids simple pro/con counting and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for student project choices. The prompt must explicitly use weighted criteria, prevent simple pro/con counting, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses weighted criteria as an explicit part of the prompt",
+        "Prevents or reduces simple pro/con counting",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Tradeoff Analysis'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Tradeoff Analysis', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better weighted criteria.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to weighted criteria"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "tradeoff-analysis",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving student project choices. Write the actual prompt you would send. It must demonstrate mastery of 'Tradeoff Analysis' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include weighted criteria; should avoid simple pro/con counting; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You are planning a release week.",
+      "prompt_a": "Give me the perfect release plan for my app with all steps.",
+      "prompt_b": "Create release-week scenarios for my app: best case, expected case, and failure case. For each, define trigger signals, priorities to cut, and a recovery action.",
+      "correct": "b",
+      "explanation": "The stronger prompt is the one that makes multiple plausible futures explicit instead of relying on single fragile plan. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "A strong prompt for this lesson should make multiple plausible futures visible enough that another person could predict what a successful answer should contain.",
+      "correct": true,
+      "explanation": "True. The model needs operational guidance, and multiple plausible futures gives it a standard to follow."
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Make a plan for my project.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves multiple plausible futures undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        }
+      ],
+      "correct_index": 3,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about multiple plausible futures, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Scenario Planning.",
+      "prompts": [
+        "Create a 7-day plan for finishing my app using three scenarios: everything works, AI grading breaks, and frontend takes 2x longer. For each, give trigger signs and actions to take.",
+        "Make a plan for my project, but make it useful for a real project.",
+        "Make a plan for my project."
+      ],
+      "correct_order": [
+        2,
+        1,
+        0
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about multiple plausible futures. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about project execution.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Define multiple plausible futures; specify success criteria; remove single fragile plan; and return the answer in a checkable structure.",
+        "Use a friendly tone and be creative with the answer.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 1,
+      "explanation": "The correct option gives operational instructions tied to multiple plausible futures. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about project execution while demonstrating Scenario Planning.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies multiple plausible futures, then returns a structured result with explicit boundaries. It avoids single fragile plan and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for project execution. The prompt must explicitly use multiple plausible futures, prevent single fragile plan, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses multiple plausible futures as an explicit part of the prompt",
+        "Prevents or reduces single fragile plan",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Scenario Planning'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Scenario Planning', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better multiple plausible futures.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to multiple plausible futures"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "scenario-planning",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving project execution. Write the actual prompt you would send. It must demonstrate mastery of 'Scenario Planning' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include multiple plausible futures; should avoid single fragile plan; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 2,
+    "task_type": "which_better",
+    "display_order": 1,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "You want to stress-test your final project plan.",
+      "prompt_a": "Run a premortem on my final project plan. Assume demo day went badly. Identify likely failure causes across data seeding, auth, stage progression, UI navigation, and AI grading. For each, give warning sign and prevention step.",
+      "prompt_b": "Be honest and tell me if my final project plan is good or bad.",
+      "correct": "a",
+      "explanation": "The stronger prompt is the one that makes preventable failure modes explicit instead of relying on surface optimism. The point is not length; it is whether the prompt transfers the right decisions from the model back to the user."
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 2,
+    "task_type": "true_false",
+    "display_order": 2,
+    "xp_reward": 5,
+    "payload": {
+      "statement": "In this lesson, the best prompt is usually the one with the most impressive adjectives, even when it leaves preventable failure modes undefined.",
+      "correct": false,
+      "explanation": "False. Impressive adjectives are not a substitute for preventable failure modes. They change vibe more than correctness."
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 2,
+    "task_type": "whats_wrong",
+    "display_order": 3,
+    "xp_reward": 5,
+    "payload": {
+      "prompt": "Tell me if my plan is good.",
+      "options": [
+        {
+          "text": "It is too short; any prompt under 40 words is automatically weak.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It is too long; models only follow short prompts reliably.",
+          "mistake_category": "distractor"
+        },
+        {
+          "text": "It fails because it leaves preventable failure modes undefined, so the model must guess the most important part of the task.",
+          "mistake_category": "core_gap"
+        },
+        {
+          "text": "It uses normal English instead of a special prompt-engineering syntax.",
+          "mistake_category": "distractor"
+        }
+      ],
+      "correct_index": 2,
+      "explanation": "The flaw is not cosmetic. The prompt gives the model too little information about preventable failure modes, so the answer may be fluent but misaligned."
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 2,
+    "task_type": "rank",
+    "display_order": 4,
+    "xp_reward": 5,
+    "payload": {
+      "scenario": "Rank the prompts from weakest to strongest for the lesson topic: Premortems and Red Teams.",
+      "prompts": [
+        "Tell me if my plan is good, but make it useful for a real project.",
+        "Tell me if my plan is good.",
+        "Run a premortem on this launch plan. Assume it failed badly after demo day. Identify the 7 most likely causes, early warning signs, prevention steps, and which owner should monitor each risk."
+      ],
+      "correct_order": [
+        1,
+        0,
+        2
+      ],
+      "explanation": "The strongest prompt is not merely longer; it contains concrete guidance about preventable failure modes. The weakest prompt leaves the model to invent the task shape."
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 2,
+    "task_type": "fill_blank",
+    "display_order": 5,
+    "xp_reward": 5,
+    "payload": {
+      "template": "Improve this prompt by adding one instruction that actually raises answer quality: __",
+      "blank_marker": "__",
+      "scenario": "You are upgrading a weak prompt about risk analysis.",
+      "options": [
+        "Make it excellent, detailed, advanced, and world-class.",
+        "Use a friendly tone and be creative with the answer.",
+        "Define preventable failure modes; specify success criteria; remove surface optimism; and return the answer in a checkable structure.",
+        "Think deeply before answering and do not make mistakes."
+      ],
+      "correct_index": 2,
+      "explanation": "The correct option gives operational instructions tied to preventable failure modes. The other options sound nice but do not strongly constrain correctness."
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 6,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "A student must reconstruct a prompt that would produce a strong answer about risk analysis while demonstrating Premortems and Red Teams.",
+      "reference_output": "A strong answer begins by clarifying the real goal, then applies preventable failure modes, then returns a structured result with explicit boundaries. It avoids surface optimism and explains any assumption it had to make.",
+      "reference_prompt": "Create a high-quality prompt for risk analysis. The prompt must explicitly use preventable failure modes, prevent surface optimism, require a structured answer, and ask the model to state assumptions before giving the final response.",
+      "evaluation_criteria": [
+        "Uses preventable failure modes as an explicit part of the prompt",
+        "Prevents or reduces surface optimism",
+        "Defines the structure of the expected output",
+        "Requires assumptions or limitations to be stated rather than hidden"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 3,
+    "task_type": "reconstruction",
+    "display_order": 7,
+    "xp_reward": 10,
+    "payload": {
+      "scenario_context": "You are teaching a junior developer how to evaluate prompts in the lesson 'Premortems and Red Teams'.",
+      "reference_output": "The weak prompt sounds confident but is underspecified. The improved prompt succeeds because it tells the model what role the answer plays, what evidence or constraints matter, what format to return, and what mistakes to avoid.",
+      "reference_prompt": "Explain to a junior developer why a prompt can sound professional and still fail. Use the lesson concept 'Premortems and Red Teams', compare weak vs strong prompting, and include one example where a shorter prompt beats a longer prompt because it contains better preventable failure modes.",
+      "evaluation_criteria": [
+        "Explains reasoning rather than only giving a better prompt",
+        "Includes weak-versus-strong comparison",
+        "Shows that length alone is not quality",
+        "Connects the explanation directly to preventable failure modes"
+      ]
+    }
+  },
+  {
+    "lesson_slug": "premortems-red-teams",
+    "stage": 4,
+    "task_type": "free_build",
+    "display_order": 8,
+    "xp_reward": 15,
+    "payload": {
+      "scenario": "You are using AI for a serious real-world task involving risk analysis. Write the actual prompt you would send. It must demonstrate mastery of 'Premortems and Red Teams' by making the important decisions explicit, preventing generic output, and producing a result that could be evaluated by another person.",
+      "rubric_hints": "Should include preventable failure modes; should avoid surface optimism; should define output shape, constraints, success criteria, and relevant context. Long answers are not automatically better; vague prestige language should be penalized."
+    }
+  }
 ]

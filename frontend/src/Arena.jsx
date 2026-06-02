@@ -102,8 +102,9 @@ export default function Arena() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [scoreUpdated, setScoreUpdated] = useState(false)
   const userEntry = useMemo(() => leaderboard.find((entry) => entry.username === user?.username), [leaderboard, user])
-  const hasSubmitted = Boolean(userEntry || result)
+  const hasStanding = Boolean(userEntry || result)
 
   const refreshLeaderboard = async (challengeId, headers) => {
     const response = await fetch(`${API_BASE}/arena/${challengeId}/leaderboard`, { headers })
@@ -161,6 +162,8 @@ export default function Arena() {
       if (!response.ok) throw new Error(data.error || 'Could not submit prompt')
       setResult(data.result)
       await refreshLeaderboard(challenge.id, { Authorization: `Bearer ${token}` })
+      setScoreUpdated(true)
+      window.setTimeout(() => setScoreUpdated(false), 3000)
     } catch (submitError) {
       setError(submitError.message || 'Could not submit prompt')
     } finally {
@@ -197,19 +200,19 @@ export default function Arena() {
             </section>
 
             <section className="submission-area">
-              {userEntry && !result && <div className="submitted-banner">You have already submitted this week</div>}
-              {!hasSubmitted && (
-                <>
-                  <label>Your Prompt</label>
-                  <textarea value={answer} onChange={(event) => setAnswer(event.target.value)} />
-                  <div className="character-count">{answer.length} characters</div>
-                  <button type="button" className="submit-button" onClick={submitPrompt} disabled={!answer.trim() || submitting}>
-                    {submitting ? 'Grading...' : 'SUBMIT PROMPT'}
-                  </button>
-                </>
+              {userEntry && (
+                <div className={`submission-info-banner ${scoreUpdated ? 'updated' : ''}`}>
+                  {scoreUpdated ? 'Score updated!' : 'You submitted this week. Submit again to improve your score.'}
+                </div>
               )}
+              <label>Your Prompt</label>
+              <textarea value={answer} onChange={(event) => setAnswer(event.target.value)} />
+              <div className="character-count">{answer.length} characters</div>
+              <button type="button" className="submit-button" onClick={submitPrompt} disabled={!answer.trim() || submitting}>
+                {submitting ? 'Grading...' : 'SUBMIT PROMPT'}
+              </button>
               <FeedbackCard result={result} />
-              {hasSubmitted && (
+              {hasStanding && (
                 <div className="standing-card">
                   <p>You are currently ranked #{(userEntry || {}).rank || '—'} on this week's leaderboard</p>
                   <strong>{(userEntry || {}).arena_points ?? result?.composite_score ?? 0}</strong>
@@ -346,13 +349,18 @@ button { font: inherit; }
   cursor: not-allowed;
   opacity: 0.65;
 }
-.submitted-banner {
+.submission-info-banner {
   margin-bottom: 16px;
   color: #9CA3AF;
-  background: #2D4A2D;
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-weight: 800;
+  background: #142314;
+  border: 1px solid #2D4A2D;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.submission-info-banner.updated {
+  color: #10B981;
 }
 .feedback-card {
   margin-top: 20px;
