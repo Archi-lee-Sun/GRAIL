@@ -403,6 +403,11 @@ function GradingResults({ result, dimensions }) {
   if (!result) return null
   const composite = Number(result.composite_score || 0)
   const passed = composite >= 7
+  const getFeedbackText = (value) => {
+    if (!value) return 'No feedback returned.'
+    if (typeof value === 'string') return value
+    return value.message || value.summary || JSON.stringify(value)
+  }
 
   return (
     <div className="grading-results">
@@ -426,7 +431,7 @@ function GradingResults({ result, dimensions }) {
         {dimensions.map((dimension) => (
           <div key={dimension.key}>
             <strong>{dimension.label}</strong>
-            <p>{result.feedback?.[dimension.key] || 'No feedback returned.'}</p>
+            <p>{getFeedbackText(result.feedback?.[dimension.key])}</p>
           </div>
         ))}
       </div>
@@ -469,11 +474,14 @@ function PromptGradingStage({ tasks, slug, stage, token, onStageComplete, isRepl
         },
         body: JSON.stringify({ task_id: currentTask.id, answer }),
       })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Prompt grading failed')
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(data.error || data.message || 'Grading failed. Please try again.')
+        return
+      }
       setResult(data)
     } catch (submitError) {
-      setError(submitError.message || 'Prompt grading failed')
+      setError(submitError.message || 'Grading failed. Please try again.')
     } finally {
       setGrading(false)
     }
@@ -527,7 +535,7 @@ function PromptGradingStage({ tasks, slug, stage, token, onStageComplete, isRepl
           </div>
         )}
 
-        {error && <div className="feedback error"><strong>{error}</strong></div>}
+        {error && <div className="feedback error"><strong>{error?.message || String(error)}</strong></div>}
 
         {!result && (
           <button type="button" className="check-button" disabled={!answer.trim() || grading} onClick={submitPrompt}>
@@ -684,7 +692,7 @@ export default function Lesson() {
         )}
         {!loading && error && (
           <div className="state-card error">
-            {error}
+            {error?.message || String(error)}
             <button type="button" className="map-back-button" onClick={() => navigate('/dashboard')}>BACK TO MAP</button>
           </div>
         )}

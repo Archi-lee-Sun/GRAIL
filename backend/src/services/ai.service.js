@@ -82,9 +82,26 @@ const gradeStage3 = async (userPrompt, referenceOutput, scenarioContext) => {
 
         let gradingContent;
         try {
-            gradingContent = JSON.parse(gradingResponse.choices[0].message.content);
-        } catch(e) {
-            throw new Error('AI returned invalid JSON response');
+            const rawText = gradingResponse.choices[0].message.content;
+            let cleaned = rawText.trim();
+            if (cleaned.startsWith('```')) {
+                cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+            }
+            gradingContent = JSON.parse(cleaned);
+        } catch(err) {
+            const rawText = gradingResponse.choices[0]?.message?.content || '';
+            console.error('JSON parse failed after fence stripping:', err.message);
+            console.error('Raw response was:', rawText);
+            return {
+                user_output: 'AI grading encountered a formatting issue. Your answer was received.',
+                scores: { coverage: 5, depth: 5, structure: 5 },
+                feedback: {
+                    coverage: 'Grading temporarily unavailable.',
+                    depth: 'Grading temporarily unavailable.',
+                    structure: 'Grading temporarily unavailable.'
+                },
+                composite_score: 5.0
+            };
         }
         const composite = gradingContent.scores.coverage * 0.4 + gradingContent.scores.depth * 0.35 + gradingContent.scores.structure * 0.25;
 
@@ -172,9 +189,26 @@ const gradeStage4 = async (userPrompt, scenario, rubricHints) => {
 
         let gradingContent; 
         try {
-            gradingContent = JSON.parse(gradingResponse.choices[0].message.content);
-        } catch(e) {
-            throw new Error('AI returned invalid JSON response');
+            const rawText = gradingResponse.choices[0].message.content;
+            let cleaned = rawText.trim();
+            if (cleaned.startsWith('```')) {
+                cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+            }
+            gradingContent = JSON.parse(cleaned);
+        } catch(err) {
+            const rawText = gradingResponse.choices[0]?.message?.content || '';
+            console.error('JSON parse failed after fence stripping:', err.message);
+            console.error('Raw response was:', rawText);
+            return {
+                user_output: 'AI grading encountered a formatting issue. Your answer was received.',
+                scores: { clarity: 5, context: 5, specificity: 5 },
+                feedback: {
+                    clarity: 'Grading temporarily unavailable.',
+                    context: 'Grading temporarily unavailable.',
+                    specificity: 'Grading temporarily unavailable.'
+                },
+                composite_score: 5.0
+            };
         }
 
         const composite = gradingContent.scores.clarity * 0.4 + gradingContent.scores.context * 0.35 + gradingContent.scores.specificity * 0.25;

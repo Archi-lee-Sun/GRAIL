@@ -188,11 +188,16 @@ const completeStage = async (req , res , next) => {
 
         const passedAttempts = tasks_attempts.filter(attempt => Number(attempt.score) > 0);
 
-        if(stageInt === 2){
-            const requiredPassed = Math.ceil(stagetasksnumbers[2] * 0.8);
-            if(passedAttempts.length < requiredPassed){
+        if (stageInt === 2) {
+            const requiredPassed = Math.ceil(stagetasksnumbers[2] * 0.8); 
+
+            const stage2PassedAttempts = tasks_attempts.filter(
+                attempt => Number(attempt.score) === 1
+            );
+
+            if (stage2PassedAttempts.length < requiredPassed) {
                 return res.status(400).json({
-                    error: `You need at least ${requiredPassed} correct answers to complete this stage. You have ${passedAttempts.length}.`
+                    error: `You need at least ${requiredPassed} correct answers to complete this stage. You have ${stage2PassedAttempts.length}.`
                 });
             }
         } else {
