@@ -102,13 +102,8 @@ function SpellbookIcon() {
 
 function FocusIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <line x1="14" y1="24" x2="14" y2="14" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="14" cy="13" r="2" fill="#9CA3AF" />
-      <line x1="14" y1="13" x2="7" y2="6" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="14" y1="13" x2="21" y2="6" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="7" cy="5" r="2.5" fill="#9CA3AF" />
-      <circle cx="21" cy="5" r="2.5" fill="#F59E0B" />
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
   )
 }
@@ -228,6 +223,10 @@ function buildSections(tracks, progress, focusLessonIds) {
       bySlug.get(lessonTrackFallback[item.lesson_slug]) ||
       byId.get(String(item.track_id)) ||
       sections[0]
+
+    if (item.track_title) {
+      track.title = item.track_title
+    }
 
     track.lessons.push({
       id: lessonId,
@@ -353,6 +352,14 @@ function buildSmoothPath(nodes) {
   }, '')
 }
 
+function sortDashboardProgress(items = []) {
+  return [...items].sort((a, b) => {
+    const trackOrderDelta = Number(a.track_display_order || 0) - Number(b.track_display_order || 0)
+    if (trackOrderDelta !== 0) return trackOrderDelta
+    return Number(a.display_order || 0) - Number(b.display_order || 0)
+  })
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
@@ -372,6 +379,33 @@ export default function Dashboard() {
   const mainRef = useRef(null)
   const popupBoundaryRef = useRef(null)
   const trackSentinelRefs = useRef({})
+
+  const refreshDashboardState = async () => {
+    const token = localStorage.getItem('token')
+    if (!token) throw new Error('Missing auth token')
+
+    const response = await fetch(`${API_BASE}/users/me/dashboard`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.message || data.error || 'Could not refresh dashboard')
+
+    const sortedProgress = sortDashboardProgress(data.progress || [])
+    setUser(data.user)
+    setProgress(sortedProgress)
+    return sortedProgress
+  }
+
+  const openFocusModal = async () => {
+    setShowFocusModal(true)
+    setFocusError('')
+
+    try {
+      await refreshDashboardState()
+    } catch (refreshError) {
+      setFocusError(refreshError.message || 'Could not refresh lesson states')
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -399,13 +433,7 @@ export default function Dashboard() {
         const tracksData = await tracksResponse.json()
 
         setUser(dashboardData.user)
-        const sortedProgress = [...(dashboardData.progress || [])].sort((a, b) => {
-          const trackOrderDelta = Number(a.track_display_order || 0) - Number(b.track_display_order || 0)
-          if (trackOrderDelta !== 0) return trackOrderDelta
-          return Number(a.display_order || 0) - Number(b.display_order || 0)
-        })
-
-        setProgress(sortedProgress)
+        setProgress(sortDashboardProgress(dashboardData.progress || []))
         setTracks(tracksData.tracks || [])
         setCurrentTrack((tracksData.tracks || [])[0]?.title || 'Foundation')
       })
@@ -450,7 +478,14 @@ export default function Dashboard() {
         active = firstVisible || { title: sections[0]?.title }
       }
 
-      if (active?.title) setCurrentTrack(active.title)
+      if (active?.title) {
+        setCurrentTrack((previousTitle) => {
+          if (previousTitle !== active.title) {
+            console.log(`Track sentinel active: data-track=${active.title}, currentTrackName=${previousTitle}`)
+          }
+          return active.title
+        })
+      }
     }
 
     const observer = new IntersectionObserver(
@@ -462,6 +497,7 @@ export default function Dashboard() {
       if (sentinel) observer.observe(sentinel)
     })
 
+    console.log('Track sentinel values:', Object.values(trackSentinelRefs.current).filter(Boolean).map((sentinel) => sentinel.dataset.track))
     pickTrackFromSentinels()
     main.addEventListener('scroll', pickTrackFromSentinels, { passive: true })
 
@@ -516,6 +552,7 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem('token')
       const headers = { Authorization: `Bearer ${token}` }
+      const freshProgress = await refreshDashboardState()
       const lessonsResponse = await fetch(`${API_BASE}/tracks/${track.slug}/lessons`, { headers })
       const lessonsData = await lessonsResponse.json()
       if (!lessonsResponse.ok) throw new Error(lessonsData.message || lessonsData.error || 'Could not load track lessons')
@@ -528,7 +565,7 @@ export default function Dashboard() {
       const pathData = await pathResponse.json()
       if (!pathResponse.ok) throw new Error(pathData.message || pathData.error || 'Could not build focus path')
 
-      const completedIds = progress
+      const completedIds = freshProgress
         .filter((lesson) => lesson.status === 'complete')
         .map((lesson) => String(lesson.lesson_id || lesson.id || lesson.lesson_slug))
       const visibleIds = new Set([
@@ -603,7 +640,7 @@ export default function Dashboard() {
           <strong>Vault</strong>
           <span>3 unlocked</span>
         </button>
-        <button type="button" className="nav-card" onClick={() => setShowFocusModal(true)}>
+        <button type="button" className="nav-card" onClick={openFocusModal}>
           <FocusIcon />
           <strong>Track Filter</strong>
           <span>{focusTrack ? focusTrack.title : 'All lessons'}</span>
@@ -674,7 +711,12 @@ export default function Dashboard() {
                 data-track={region.title}
                 key={`track-sentinel-${region.slug || region.title}`}
                 ref={(element) => {
-                  if (element) trackSentinelRefs.current[region.slug || region.title] = element
+                  const sentinelKey = region.slug || region.title
+                  if (element) {
+                    trackSentinelRefs.current[sentinelKey] = element
+                  } else {
+                    delete trackSentinelRefs.current[sentinelKey]
+                  }
                 }}
                 style={{
                   top: `${region.y}px`,
@@ -711,12 +753,15 @@ export default function Dashboard() {
             <h2>Track Filter</h2>
             <p>Choose a track to show only the lessons that matter for that route.</p>
             <div className="focus-track-list">
-              {[
-                { slug: 'foundation', title: 'Foundation' },
-                { slug: 'code-assistant', title: 'Code Assistant' },
-                { slug: 'email-writing', title: 'Email and Writing' },
-                { slug: 'decision-making', title: 'Decision Making' },
-              ].map((track) => (
+              {(tracks.length
+                ? [...tracks].sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0))
+                : [
+                    { slug: 'foundation', title: 'Foundation' },
+                    { slug: 'code-assistant', title: 'Code Assistant' },
+                    { slug: 'email-writing', title: 'Email & Professional Writing' },
+                    { slug: 'decision-making', title: 'Decision Making & Strategy' },
+                  ]
+              ).map((track) => (
                 <button
                   type="button"
                   key={track.slug}

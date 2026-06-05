@@ -73,6 +73,7 @@ const initializeUserLessonProgress = async (userId) => {
         FROM lessons
         INNER JOIN tracks ON tracks.id = lessons.track_id
         ORDER BY tracks.display_order, lessons.display_order
+        ON CONFLICT (user_id, lesson_id) DO NOTHING
     `;
 
     try {
