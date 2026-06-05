@@ -28,7 +28,10 @@ const stagetasksnumbers = {
 
 const { 
     getDirectDependents, 
-    checkAllDepsComplete 
+    checkAllDepsComplete,
+    unlockTrackFirstLesson,
+    getCompletedLessonCount,
+    getTracksWithUnlockThreshold
 } = require('../queries/graph.queries');
 
 const {
@@ -43,6 +46,7 @@ const {
     unlockVaultEntries
 } = require('../queries/vault.queries');
 
+const STAGE_34_PASS_THRESHOLD = 5.0;
 
 const startSession = async (req , res , next) => {
     const {slug} = req.params;
@@ -80,7 +84,7 @@ const startSession = async (req , res , next) => {
             const tasks = await getLessonTasksByStage(lesson.id, stage);
             const existingAttempts = await getTaskAttemptsByStage(userId, lesson.id, stage);
             const passedTaskIds = existingAttempts
-                .filter(a => Number(a.score) > 0)
+                .filter(a => Number(a.score) >= STAGE_34_PASS_THRESHOLD)
                 .map(a => a.task_id);
             const tasksWithStatus = tasks.map(task => ({
                 ...task,
@@ -101,14 +105,13 @@ const checkStage2Answer = (task, answer) => {
     switch(task.task_type) {
         case 'which_better':
         case 'true_false':
-        case 'fill_blank':
             return task.payload.correct === answer;
+        case 'fill_blank':
+            return task.payload.correct_index === answer;
         case 'whats_wrong':
             return task.payload.correct_index === answer;
         case 'rank':
-            return JSON.stringify(task.payload.correct_order) === JSON.stringify(answer);
-        default:
-            return false;
+            return JSON.stringify(task.payload.correct_order) === JSON.stringify(answer.map(Number));
     }
 }
 
@@ -130,7 +133,20 @@ const checkAnswer = async (req , res , next) => {
                 return res.json({ isCorrect, feedback: { explanation: task.payload.explanation }, practice: true });
             }
             if(task.stage === 3 || task.stage === 4){
-                return res.json({ feedback: 'AI grading not yet implemented', practice: true });
+                const gradingResult = task.stage === 3
+                    ? await gradeStage3(answer, task.payload.reference_output, task.payload.scenario_context)
+                    : await gradeStage4(answer, task.payload.scenario, task.payload.rubric_hints);
+
+                await updateTaskAttemptScore(task_id, userId, gradingResult.composite_score, gradingResult.feedback);
+
+                return res.json({
+                    passed: gradingResult.composite_score >= STAGE_34_PASS_THRESHOLD,
+                    feedback: gradingResult.feedback,
+                    scores: gradingResult.scores,
+                    user_output: gradingResult.user_output,
+                    composite_score: gradingResult.composite_score,
+                    practice: true
+                });
             }
         }
 
@@ -146,11 +162,11 @@ const checkAnswer = async (req , res , next) => {
             if(task.stage === 3){
                 const gradingResult = await gradeStage3(answer, task.payload.reference_output, task.payload.scenario_context)
                 await saveTaskAttempt(userId , task_id , task.stage , {answer} , gradingResult.composite_score , gradingResult.feedback , task.xp_reward)
-                return res.json({passed: gradingResult.composite_score >= 7 , feedback : gradingResult.feedback , scores: gradingResult.scores , user_output: gradingResult.user_output , composite_score: gradingResult.composite_score})
+                return res.json({passed: gradingResult.composite_score >= STAGE_34_PASS_THRESHOLD , feedback : gradingResult.feedback , scores: gradingResult.scores , user_output: gradingResult.user_output , composite_score: gradingResult.composite_score})
             } else {
                 const gradingResult = await gradeStage4(answer, task.payload.scenario, task.payload.rubric_hints)
                 await saveTaskAttempt(userId , task_id , task.stage , {answer} , gradingResult.composite_score , gradingResult.feedback , task.xp_reward)
-                return res.json({passed: gradingResult.composite_score >= 7 , feedback : gradingResult.feedback , scores: gradingResult.scores , user_output: gradingResult.user_output , composite_score: gradingResult.composite_score})
+                return res.json({passed: gradingResult.composite_score >= STAGE_34_PASS_THRESHOLD , feedback : gradingResult.feedback , scores: gradingResult.scores , user_output: gradingResult.user_output , composite_score: gradingResult.composite_score})
             }
         }
     } catch(error){
@@ -186,8 +202,6 @@ const completeStage = async (req , res , next) => {
             return res.status(400).json({error : 'Not all tasks attempted'})
         }
 
-        const passedAttempts = tasks_attempts.filter(attempt => Number(attempt.score) > 0);
-
         if (stageInt === 2) {
             const requiredPassed = Math.ceil(stagetasksnumbers[2] * 0.8); 
 
@@ -201,9 +215,13 @@ const completeStage = async (req , res , next) => {
                 });
             }
         } else {
+            const passedAttempts = tasks_attempts.filter(
+                attempt => Number(attempt.score) >= STAGE_34_PASS_THRESHOLD
+            );
+
             if(passedAttempts.length < stagetasksnumbers[stageInt]){
                 return res.status(400).json({
-                    error: 'You must pass all tasks to complete this stage.'
+                    error: `You must pass all tasks with a score of at least ${STAGE_34_PASS_THRESHOLD} to complete this stage. You have ${passedAttempts.length}.`
                 });
             }
         }
@@ -227,8 +245,20 @@ const completeStage = async (req , res , next) => {
                     await updateLessonStatus(userId, dependent.lesson_id, 'unlocked');
                 }
             }
+
             await unlockVaultEntries(userId, lesson.id);
             await updateSRS(userId, lesson.id, 3);
+        }
+
+        const completedCount = await getCompletedLessonCount(userId);
+        const tracksToCheck = await getTracksWithUnlockThreshold();
+        console.log(`Track unlock check: completedCount=${completedCount}`);
+        for (const track of tracksToCheck) {
+            console.log(`Checking track ${track.slug}: threshold=${track.unlock_after_lesson_count}`);
+            if (completedCount >= Number(track.unlock_after_lesson_count)) {
+                console.log(`Unlocking first lesson of ${track.slug}`);
+                await unlockTrackFirstLesson(userId, track.slug);
+            }
         }
 
         return res.json({

@@ -90,18 +90,8 @@ const gradeStage3 = async (userPrompt, referenceOutput, scenarioContext) => {
             gradingContent = JSON.parse(cleaned);
         } catch(err) {
             const rawText = gradingResponse.choices[0]?.message?.content || '';
-            console.error('JSON parse failed after fence stripping:', err.message);
-            console.error('Raw response was:', rawText);
-            return {
-                user_output: 'AI grading encountered a formatting issue. Your answer was received.',
-                scores: { coverage: 5, depth: 5, structure: 5 },
-                feedback: {
-                    coverage: 'Grading temporarily unavailable.',
-                    depth: 'Grading temporarily unavailable.',
-                    structure: 'Grading temporarily unavailable.'
-                },
-                composite_score: 5.0
-            };
+            console.error('JSON parse failed. Raw response:', rawText);
+            throw new Error('AI returned invalid JSON: ' + rawText.substring(0, 200));
         }
         const composite = gradingContent.scores.coverage * 0.4 + gradingContent.scores.depth * 0.35 + gradingContent.scores.structure * 0.25;
 
@@ -164,13 +154,14 @@ const gradeStage4 = async (userPrompt, scenario, rubricHints) => {
             Rubric hints:
             ${rubricHints}
 
-            Respond in JSON only. No preamble, no markdown, no explanation outside JSON. Exactly this shape:
+            Scores must vary based on the actual quality of the student's prompt and generated output. Do not reuse default scores. Penalize missing context, vague instructions, weak constraints, and generic output.
+
+            Respond ONLY with a JSON object. No explanation, no markdown, no extra text.
+            Format:
             {
-                "scores": {
-                    "clarity": <number>,
-                    "context": <number>,
-                    "specificity": <number>
-                },
+                "clarity": <0-10>,
+                "context": <0-10>,
+                "specificity": <0-10>,
                 "feedback": {
                     "clarity": "<specific actionable feedback telling student exactly what to improve>",
                     "context": "<specific actionable feedback>",
@@ -197,17 +188,18 @@ const gradeStage4 = async (userPrompt, scenario, rubricHints) => {
             gradingContent = JSON.parse(cleaned);
         } catch(err) {
             const rawText = gradingResponse.choices[0]?.message?.content || '';
-            console.error('JSON parse failed after fence stripping:', err.message);
-            console.error('Raw response was:', rawText);
-            return {
-                user_output: 'AI grading encountered a formatting issue. Your answer was received.',
-                scores: { clarity: 5, context: 5, specificity: 5 },
-                feedback: {
-                    clarity: 'Grading temporarily unavailable.',
-                    context: 'Grading temporarily unavailable.',
-                    specificity: 'Grading temporarily unavailable.'
+            console.error('JSON parse failed. Raw response:', rawText);
+            throw new Error('AI returned invalid JSON: ' + rawText.substring(0, 200));
+        }
+
+        if (!gradingContent.scores) {
+            gradingContent = {
+                scores: {
+                    clarity: gradingContent.clarity,
+                    context: gradingContent.context,
+                    specificity: gradingContent.specificity
                 },
-                composite_score: 5.0
+                feedback: gradingContent.feedback
             };
         }
 
