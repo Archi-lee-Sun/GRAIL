@@ -29,14 +29,9 @@ function SwordsIcon({ size = 40 }) {
 
 function RankBadge({ rank }) {
   if (rank > 3) return <span className="rank-number">#{rank}</span>
-  const colors = ['#F59E0B', '#9CA3AF', '#92400E']
   return (
-    <span className="medal" style={{ color: colors[rank - 1] }}>
-      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
-        <circle cx="17" cy="17" r="14" fill="currentColor" opacity="0.18" />
-        <circle cx="17" cy="17" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text x="17" y="21" textAnchor="middle" fill="currentColor" fontSize="12" fontWeight="900">{rank}</text>
-      </svg>
+    <span className={`medal rank-medal-${rank}`}>
+      {rank}
     </span>
   )
 }
@@ -199,31 +194,74 @@ button { font: inherit; }
   align-items: center;
   justify-content: space-between;
   margin: 6px auto;
-  padding: 14px 20px;
-  background: #1F361F;
-  border: 1px solid #2D4A2D;
+  padding: 20px 24px;
+  background: #141414;
+  border: 1px solid #2A2A2A;
   border-radius: 12px;
 }
-.rank-1 { background: linear-gradient(135deg, #2D1F00, #1A1200); border-color: #F59E0B; }
-.rank-2 { background: linear-gradient(135deg, #1A1F1A, #101510); border-color: #9CA3AF; }
-.rank-3 { background: linear-gradient(135deg, #1A1210, #120D0A); border-color: #92400E; }
-.rank-row.current-user {
-  background: #1F1040;
-  border-color: #7C3AED;
+.rank-1 {
+  border-left: 4px solid #FFD700;
 }
+.rank-2 {
+  border-left: 4px solid #C8C8C8;
+}
+.rank-3 {
+  border-left: 4px solid #CD7F32;
+}
+.rank-row.current-user {
+  border: 2px solid #7C3AED;
+}
+.rank-row.current-user.rank-1 { border-left: 4px solid #FFD700; }
+.rank-row.current-user.rank-2 { border-left: 4px solid #C8C8C8; }
+.rank-row.current-user.rank-3 { border-left: 4px solid #CD7F32; }
 .rank-left {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 .rank-number {
-  min-width: 36px;
+  min-width: 34px;
   color: #9CA3AF;
-  font-weight: 700;
+  font-weight: 600;
+}
+.medal {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 900;
+}
+.rank-medal-1 {
+  background: #FFD700;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.8);
+}
+.rank-medal-2 {
+  background: #C8C8C8;
+  box-shadow: 0 0 12px rgba(200, 200, 200, 0.6);
+}
+.rank-medal-3 {
+  background: #CD7F32;
+  box-shadow: 0 0 12px rgba(205, 127, 50, 0.6);
 }
 .username {
   color: #F1F0FF;
   font-size: 16px;
+  font-weight: 400;
+}
+.rank-1 .username {
+  color: #FFD700;
+  font-weight: 700;
+}
+.rank-2 .username {
+  color: #C8C8C8;
+  font-weight: 600;
+}
+.rank-3 .username {
+  color: #CD7F32;
   font-weight: 600;
 }
 .username em {

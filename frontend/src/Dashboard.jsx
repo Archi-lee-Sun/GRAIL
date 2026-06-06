@@ -108,16 +108,74 @@ function FocusIcon() {
   )
 }
 
+function FireStatIcon() {
+  return (
+    <svg className="stat-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <linearGradient id="statFireGradient" x1="12" y1="22" x2="12" y2="2">
+          <stop offset="0" stopColor="#FF4500" />
+          <stop offset="1" stopColor="#FFD700" />
+        </linearGradient>
+      </defs>
+      <path d="M12.3 1.8c1.3 4.2-1.8 5.8-1.8 8.3 0 1.1.7 1.9 1.7 1.9 1.7 0 2.6-1.7 2.4-3.8 3 2.3 4.6 5.1 4.6 8 0 4.2-3.1 7-7.2 7s-7.2-2.8-7.2-7c0-3.5 2.2-6.2 5.1-8.6-.2 2 .5 3.2 1.4 3.2 1.4 0 2.2-2.5 1-9Z" fill="url(#statFireGradient)" />
+      <path d="M12 13c2.2 2 3.1 3.5 3.1 5.1a3.1 3.1 0 0 1-6.2 0c0-1.7 1.1-3.4 3.1-5.1Z" fill="#FF6B00" />
+    </svg>
+  )
+}
+
+function DiamondStatIcon() {
+  return (
+    <svg className="stat-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <linearGradient id="statDiamondGradient" x1="12" y1="3" x2="12" y2="21">
+          <stop offset="0" stopColor="#60A5FA" />
+          <stop offset="1" stopColor="#3B82F6" />
+        </linearGradient>
+      </defs>
+      <path d="m3 8 4-5h10l4 5-9 13L3 8Z" fill="url(#statDiamondGradient)" />
+      <path d="m7 3 5 18L17 3M3 8h18L7 3m10 0-5 5-5-5" fill="none" stroke="#BAE6FD" strokeWidth="1.3" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function FreezeStatIcon() {
+  return (
+    <svg className="stat-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M12 2 9.5 4.5M12 2l2.5 2.5M12 22l-2.5-2.5M12 22l2.5-2.5M3.3 7l3.4.9M3.3 7l.9 3.4M20.7 17l-3.4-.9M20.7 17l-.9-3.4M3.3 17l.9-3.4M3.3 17l3.4-.9M20.7 7l-.9 3.4M20.7 7l-3.4.9" stroke="#BAE6FD" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function NodeStageIcon({ stage }) {
+  if (stage === 1) {
+    return (
+      <svg className="node-state-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 4.7C3 3.8 3.8 3.1 4.7 3.2 7.4 3.4 9.4 4.2 11 5.6V20c-1.7-1.3-3.8-2-6.5-2.1A1.5 1.5 0 0 1 3 16.4V4.7Zm18 0c0-.9-.8-1.6-1.7-1.5-2.7.2-4.7 1-6.3 2.4V20c1.7-1.3 3.8-2 6.5-2.1a1.5 1.5 0 0 0 1.5-1.5V4.7Z" fill="currentColor" />
+        <path d="M12 5.4V20" stroke="#1A2E1A" strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (stage === 2) {
+    return (
+      <svg className="node-state-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2.5C6.2 2.5 2 6 2 10.7c0 3.1 1.8 5.7 4.7 7.1L5.6 22l5-2.9c.5.1.9.1 1.4.1 5.8 0 10-3.5 10-8.3S17.8 2.5 12 2.5Z" fill="currentColor" />
+        <path d="M9.1 8.4c.2-2 1.6-3.2 3.7-3.2 2.2 0 3.7 1.2 3.7 3.1 0 1.5-.8 2.3-2.1 3.1-.9.6-1.2 1-1.2 1.9h-2.7c0-1.6.5-2.4 1.8-3.2.9-.6 1.3-1 1.3-1.7 0-.6-.4-1-1.1-1-.7 0-1.1.4-1.2 1.2l-2.2-.2Zm1.3 6.6h2.9v2.7h-2.9V15Z" fill="#1A2E1A" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg className="node-state-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="m4.1 15.8 10.8-10.8 4.1 4.1L8.2 19.9 3 21l1.1-5.2Z" fill="currentColor" />
+      <path d="m15.7 4.2 1.7-1.7a1.7 1.7 0 0 1 2.4 0l1.7 1.7a1.7 1.7 0 0 1 0 2.4l-1.7 1.7-4.1-4.1Z" fill="currentColor" />
+      <path d="m4.1 15.8 4.1 4.1L3 21l1.1-5.2Z" fill="#FFFFFF" />
+    </svg>
+  )
+}
+
 function StageMushroomNode({ node, onSelect }) {
   const isLocked = node.state === 'locked'
-  const dots = Array.from({ length: node.stage })
-  const dotLayouts = {
-    1: [{ left: 37, top: 28 }],
-    2: [{ left: 25, top: 29 }, { left: 49, top: 29 }],
-    3: [{ left: 37, top: 18 }, { left: 24, top: 39 }, { left: 50, top: 39 }],
-    4: [{ left: 26, top: 20 }, { left: 50, top: 20 }, { left: 26, top: 43 }, { left: 50, top: 43 }],
-  }
-  const dotPositions = dotLayouts[node.stage] || dotLayouts[1]
 
   return (
     <button
@@ -135,13 +193,7 @@ function StageMushroomNode({ node, onSelect }) {
       aria-label={`${node.title} stage ${node.stage} ${node.state}`}
     >
       <span className="mushroom-cap">
-        {dots.map((_, dotIndex) => (
-          <span
-            className="mushroom-dot"
-            key={dotIndex}
-            style={dotPositions[dotIndex]}
-          />
-        ))}
+        <NodeStageIcon stage={node.stage} />
       </span>
     </button>
   )
@@ -635,6 +687,9 @@ export default function Dashboard() {
         </div>
         <div className="track-title">{currentTrack}</div>
         <div className="stats">
+          <span className="stat-premium streak-stat"><FireStatIcon />{user?.streak_count ?? 0}</span>
+          <span className="stat-premium xp-stat"><DiamondStatIcon />{user?.xp ?? 0}</span>
+          <span className="stat-premium freeze-stat"><FreezeStatIcon />{user?.streak_freeze_count ?? 0}</span>
           <span><b>🔥</b>{user?.streak_count ?? 0}</span>
           <span><b>💎</b>{user?.xp ?? 0}</span>
           <span className="freeze"><b>❄️</b>{user?.streak_freeze_count ?? 0}</span>
@@ -918,14 +973,46 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  font-weight: 800;
 }
 
-.stats b {
-  font-size: 17px;
+.stats > span:not(.stat-premium) {
+  display: none;
 }
 
-.stats .freeze {
-  color: #FFFFFF;
+.stat-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  transition: transform 0.2s ease;
+}
+
+.stat-icon:hover {
+  transform: scale(1.2);
+}
+
+.streak-stat {
+  color: #FF6B00;
+}
+
+.streak-stat .stat-icon {
+  filter: drop-shadow(0 0 6px rgba(255, 100, 0, 0.8));
+}
+
+.xp-stat {
+  color: #60A5FA;
+}
+
+.xp-stat .stat-icon {
+  filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.8));
+}
+
+.freeze-stat {
+  color: #BAE6FD;
+}
+
+.freeze-stat .stat-icon {
+  filter: drop-shadow(0 0 5px rgba(186, 230, 253, 0.7));
 }
 
 .avatar {
@@ -1291,6 +1378,16 @@ button {
   border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
 }
 
+.node-state-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  color: #FFFFFF;
+}
+
 .mushroom-complete .mushroom-cap {
   background: linear-gradient(160deg, #DDD6FE 0%, ${palette.complete} 35%, #2E1065 100%);
   box-shadow: 0 8px 0 #3B0764, 0 10px 8px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.4);
@@ -1309,19 +1406,6 @@ button {
 .mushroom-locked .mushroom-cap {
   background: linear-gradient(160deg, #D1D5DB 0%, #374151 35%, #0B1220 100%);
   box-shadow: 0 8px 0 #111827, 0 10px 8px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.4);
-}
-
-.mushroom-dot {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.16);
-}
-
-.mushroom-complete .mushroom-dot {
-  background: #FFFFFF;
 }
 
 .lesson-popup {
@@ -1384,23 +1468,28 @@ button {
 
 .continue-button {
   width: 100%;
-  padding: 12px;
+  padding: 15px 24px;
   cursor: pointer;
-  color: #0F0F0F;
+  color: #1A2E1A;
   background: ${palette.amber};
   border: 0;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 950;
-  transition: transform 120ms ease, filter 120ms ease;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  transition: all 0.15s ease;
 }
 
 .continue-button:hover {
-  filter: brightness(1.07);
+  transform: translateY(-1px);
+  background: #D97706;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
 }
 
 .continue-button:active {
-  transform: scale(0.97);
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 .center-state,

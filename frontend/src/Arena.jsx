@@ -36,7 +36,7 @@ function SwordsIcon({ size = 48 }) {
 
 function ScoreRow({ label, value }) {
   const score = Number(value || 0)
-  const color = score >= 7 ? '#7C3AED' : score >= 5 ? '#F59E0B' : '#EF4444'
+  const color = score >= 7 ? '#16FF6E' : '#FF1744'
   return (
     <div className="score-row">
       <div className="score-meta">
@@ -81,7 +81,10 @@ function FeedbackCard({ result }) {
       <div className={`pass-badge ${passed ? 'passed' : 'failed'}`}>{passed ? 'PASSED' : 'NEEDS WORK'}</div>
       <div className="dimension-feedback">
         {['clarity', 'context', 'specificity'].map((key) => (
-          <div key={key}>
+          <div
+            key={key}
+            style={{ borderLeftColor: Number(scores[key] || 0) >= 7 ? '#16FF6E' : '#FF1744' }}
+          >
             <strong>{key}</strong>
             <p>{feedback[key] || feedback.summary || 'No feedback returned.'}</p>
           </div>
@@ -345,14 +348,24 @@ button { font: inherit; }
 .submit-button {
   width: 100%;
   margin-top: 16px;
-  padding: 16px;
+  padding: 15px;
   color: #1A2E1A;
   cursor: pointer;
   background: #F59E0B;
   border: 0;
   border-radius: 10px;
-  font-size: 16px;
-  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  transition: all 0.15s ease;
+}
+.submit-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  background: #D97706;
+}
+.submit-button:not(:disabled):active {
+  transform: translateY(1px);
 }
 .submit-button:disabled {
   cursor: not-allowed;
@@ -379,15 +392,15 @@ button { font: inherit; }
   font-weight: 700;
 }
 .submission-info-banner.updated {
-  color: #10B981;
+  color: #16FF6E;
 }
 .feedback-card {
   margin-top: 20px;
-  padding: 24px;
+  padding: 28px;
   color: #F1F0FF;
-  background: #0D1117;
-  border: 1px solid #2D4A2D;
-  border-radius: 12px;
+  background: #141414;
+  border: 1px solid #2A2A2A;
+  border-radius: 14px;
 }
 .feedback-card h2 {
   margin: 0 0 18px;
@@ -401,15 +414,18 @@ button { font: inherit; }
 }
 .score-meta span {
   color: #F1F0FF;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: capitalize;
 }
-.score-meta strong { color: #F59E0B; }
+.score-meta strong {
+  color: #F59E0B;
+  font-weight: 700;
+}
 .score-bar {
-  height: 8px;
+  height: 10px;
   overflow: hidden;
-  background: #2D4A2D;
-  border-radius: 4px;
+  background: #141414;
+  border-radius: 6px;
 }
 .score-bar span {
   display: block;
@@ -419,37 +435,52 @@ button { font: inherit; }
 .composite-score {
   margin-top: 22px;
   color: #F59E0B;
-  font-size: 32px;
-  font-weight: 950;
+  font-size: 40px;
+  font-weight: 800;
   text-align: center;
 }
 .pass-badge {
   width: fit-content;
   margin: 10px auto 20px;
-  border-radius: 999px;
-  padding: 7px 14px;
+  border-radius: 20px;
+  padding: 5px 18px;
   color: #FFFFFF;
-  font-size: 12px;
-  font-weight: 950;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
-.pass-badge.passed { background: #7C3AED; }
-.pass-badge.failed { background: #EF4444; }
+.pass-badge.passed {
+  color: #1A2E1A;
+  background: #F59E0B;
+}
+.pass-badge.failed {
+  color: #FFFFFF;
+  background: #FF1744;
+}
 .dimension-feedback {
   display: grid;
-  gap: 14px;
+}
+.dimension-feedback > div {
+  margin-bottom: 10px;
+  padding: 14px 18px;
+  background: #1A1A1A;
+  border: 1px solid #2A2A2A;
+  border-left: 4px solid;
+  border-radius: 10px;
 }
 .dimension-feedback strong {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: #F1F0FF;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   text-transform: capitalize;
 }
 .dimension-feedback p {
   margin: 0;
-  color: #9CA3AF;
-  line-height: 1.55;
+  color: #D1D5DB;
+  font-size: 14px;
+  line-height: 1.6;
 }
 .standing-card {
   margin-top: 18px;

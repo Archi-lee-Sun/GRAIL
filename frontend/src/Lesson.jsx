@@ -166,6 +166,25 @@ function answerMatches(optionValue, selectedAnswer) {
   return JSON.stringify(optionValue) === JSON.stringify(selectedAnswer)
 }
 
+function getCorrectAnswer(task) {
+  if (task.task_type === 'which_better' || task.task_type === 'true_false') {
+    return task.payload.correct
+  }
+  if (task.task_type === 'fill_blank' || task.task_type === 'whats_wrong') {
+    return task.payload.correct_index
+  }
+  return null
+}
+
+function getOptionStateClass(task, checked, feedback, optionValue, selectedAnswer) {
+  const isSelected = answerMatches(optionValue, selectedAnswer)
+  if (!checked) return isSelected ? 'selected' : ''
+
+  if (answerMatches(optionValue, getCorrectAnswer(task))) return 'correct'
+  if (isSelected && !feedback?.isCorrect) return 'wrong'
+  return isSelected ? 'selected' : ''
+}
+
 function TaskBody({ task, selectedAnswer, setSelectedAnswer, checked, feedback }) {
   const payload = task.payload || {}
   const options = getOptions(task)
@@ -223,7 +242,7 @@ function TaskBody({ task, selectedAnswer, setSelectedAnswer, checked, feedback }
           {options.map((option) => (
             <button
               type="button"
-              className={`prompt-block ${answerMatches(option.value, selectedAnswer) ? 'selected' : ''}`}
+              className={`prompt-block ${getOptionStateClass(task, checked, feedback, option.value, selectedAnswer)}`}
               key={option.value}
               disabled={checked}
               onClick={() => setSelectedAnswer(option.value)}
@@ -253,7 +272,7 @@ function TaskBody({ task, selectedAnswer, setSelectedAnswer, checked, feedback }
           {options.map((option) => (
             <button
               type="button"
-              className={`answer-option ${answerMatches(option.value, selectedAnswer) ? 'selected' : ''} ${checked ? getCheckedClass(feedback, option.value, selectedAnswer) : ''}`}
+              className={`answer-option ${getOptionStateClass(task, checked, feedback, option.value, selectedAnswer)}`}
               key={String(option.value)}
               disabled={checked}
               onClick={() => setSelectedAnswer(option.value)}
@@ -268,11 +287,6 @@ function TaskBody({ task, selectedAnswer, setSelectedAnswer, checked, feedback }
       <Feedback checked={checked} feedback={feedback} />
     </>
   )
-}
-
-function getCheckedClass(feedback, optionValue, selectedAnswer) {
-  if (!answerMatches(optionValue, selectedAnswer)) return ''
-  return feedback?.isCorrect || feedback?.passed ? 'correct' : 'wrong'
 }
 
 function Feedback({ checked, feedback }) {
@@ -384,7 +398,7 @@ function StageTwoTasks({ tasks, slug, stage, token, onStageComplete, isReplay, o
 
 function ScoreRow({ label, score }) {
   const value = Number(score || 0)
-  const color = value >= 7 ? '#7C3AED' : value >= 5 ? '#F59E0B' : '#EF4444'
+  const fillColor = value >= 7 ? '#16FF6E' : '#FF1744'
 
   return (
     <div className="score-row">
@@ -393,7 +407,7 @@ function ScoreRow({ label, score }) {
         <strong>{value}/10</strong>
       </div>
       <div className="score-bar">
-        <span style={{ width: `${Math.min(100, value * 10)}%`, background: color }} />
+        <span style={{ width: `${Math.min(100, value * 10)}%`, background: fillColor }} />
       </div>
     </div>
   )
@@ -429,7 +443,10 @@ function GradingResults({ result, dimensions }) {
       </div>
       <div className="dimension-feedback">
         {dimensions.map((dimension) => (
-          <div key={dimension.key}>
+          <div
+            key={dimension.key}
+            style={{ borderLeftColor: Number(result.scores?.[dimension.key] || 0) >= 7 ? '#16FF6E' : '#FF1744' }}
+          >
             <strong>{dimension.label}</strong>
             <p>{getFeedbackText(result.feedback?.[dimension.key])}</p>
           </div>
@@ -501,7 +518,7 @@ function PromptGradingStage({ tasks, slug, stage, token, onStageComplete, isRepl
   return (
     <>
       <ProgressHeader current={taskIndex + 1} total={tasks.length} />
-      <div className={isStage3 ? 'task-card prompt-stage-card' : 'prompt-stage-card'}>
+      <div className={isStage3 ? 'task-card prompt-stage-card' : 'prompt-stage-card stage-four-card'}>
         {isStage3 ? (
           <div className="scenario-block">
             <span>Your scenario:</span>
@@ -925,20 +942,40 @@ button {
 
 .understand-button,
 .check-button,
-.xp-card button {
+.xp-card button,
+.map-back-button {
   display: block;
   cursor: pointer;
-  color: #0F0F0F;
+  color: #1A2E1A;
   background: #F59E0B;
   border: 0;
-  border-radius: 12px;
-  font-weight: 950;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  transition: all 0.15s ease;
+}
+
+.understand-button:hover,
+.check-button:not(:disabled):hover,
+.xp-card button:hover,
+.map-back-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  background: #D97706;
+}
+
+.understand-button:active,
+.check-button:not(:disabled):active,
+.xp-card button:active,
+.map-back-button:not(:disabled):active {
+  transform: translateY(1px);
 }
 
 .understand-button {
   margin: 32px auto 0;
-  padding: 16px 48px;
-  font-size: 16px;
+  padding-inline: 48px;
 }
 
 .understand-button:disabled {
@@ -989,46 +1026,62 @@ button {
   width: 100%;
   cursor: pointer;
   color: #F1F0FF;
-  background: #1F361F;
-  border: 2px solid #2D4A2D;
+  background: #141414;
+  border: 1px solid #2A2A2A;
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 20px;
   text-align: left;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition: all 0.15s ease;
 }
 
 .prompt-block:hover,
 .answer-option:hover {
-  border-color: #4D6A4D;
+  background: #1E1E1E;
+  border-color: #3A3A3A;
+  box-shadow: none;
 }
 
 .prompt-block.selected,
 .answer-option.selected {
-  background: #1F1040;
-  border-color: #7C3AED;
+  background: #1A1535;
+  border: 2px solid #7C3AED;
+  box-shadow: none;
 }
 
+.prompt-block.correct,
 .answer-option.correct {
-  background: #0D2E1F;
-  border-color: #10B981;
+  background: rgba(22, 255, 110, 0.1);
+  border: 2px solid #16FF6E;
+  box-shadow: none;
 }
 
+.prompt-block.wrong,
 .answer-option.wrong {
-  background: #2E0D0D;
-  border-color: #EF4444;
+  background: rgba(255, 23, 68, 0.1);
+  border: 2px solid #FF1744;
+  box-shadow: none;
 }
 
 .prompt-block span,
 .answer-option span {
   display: block;
   margin-bottom: 8px;
-  color: #9CA3AF;
-  font-size: 12px;
-  font-weight: 900;
+  color: #F59E0B;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-.prompt-block code,
+.prompt-block code {
+  display: block;
+  white-space: pre-wrap;
+  color: #F1F0FF;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
 .bad-prompt code {
   display: block;
   white-space: pre-wrap;
@@ -1096,13 +1149,21 @@ button {
   margin-bottom: 20px;
   background: #142314;
   border: 1px solid #2D4A2D;
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 12px;
+  padding: 20px 24px;
 }
 
 .scenario-card span {
+  color: #F59E0B;
   font-size: 11px;
-  letter-spacing: 1.6px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.scenario-card p {
+  color: #F1F0FF;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 .prompt-stage-card textarea {
@@ -1124,6 +1185,17 @@ button {
   outline: none;
 }
 
+.stage-four-card textarea {
+  color: #F1F0FF;
+  background: #141414;
+  border: 1px solid #3A3A3A;
+  border-radius: 10px;
+}
+
+.stage-four-card textarea:focus {
+  border-color: #7C3AED;
+}
+
 .character-count {
   margin-top: 8px;
   color: #9CA3AF;
@@ -1133,32 +1205,32 @@ button {
 
 .tips-card {
   margin-top: 16px;
-  padding: 16px;
-  background: #1F1040;
-  border: 1px solid #7C3AED;
-  border-radius: 8px;
+  padding: 16px 20px;
+  background: #1A1535;
+  border: 1px solid #4A3A7A;
+  border-radius: 12px;
 }
 
 .tips-card strong {
-  color: #F1F0FF;
+  color: #A78BFA;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .tips-card ul {
   margin: 10px 0 0;
   padding-left: 18px;
-  color: #9CA3AF;
+  color: #C4B5FD;
   font-size: 13px;
   line-height: 1.6;
 }
 
 .grading-results {
   margin-top: 24px;
-  padding: 24px;
-  background: #0D1117;
-  border: 1px solid #2D4A2D;
-  border-radius: 12px;
+  padding: 28px;
+  background: #141414;
+  border: 1px solid #2A2A2A;
+  border-radius: 14px;
 }
 
 .grading-results h2 {
@@ -1180,18 +1252,20 @@ button {
 
 .score-meta span {
   color: #F1F0FF;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .score-meta strong {
   color: #F59E0B;
+  font-weight: 700;
 }
 
 .score-bar {
-  height: 8px;
+  height: 10px;
   overflow: hidden;
-  background: #2D4A2D;
-  border-radius: 4px;
+  background: #141414;
+  border-radius: 6px;
 }
 
 .score-bar span {
@@ -1203,28 +1277,29 @@ button {
 .composite-score {
   margin-top: 22px;
   color: #F59E0B;
-  font-size: 32px;
-  font-weight: 950;
+  font-size: 40px;
+  font-weight: 800;
   text-align: center;
 }
 
 .pass-badge {
   width: fit-content;
   margin: 10px auto 20px;
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 12px;
-  font-weight: 950;
+  border-radius: 20px;
+  padding: 5px 18px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
 .pass-badge.passed {
-  color: #FFFFFF;
-  background: #7C3AED;
+  color: #1A2E1A;
+  background: #F59E0B;
 }
 
 .pass-badge.failed {
   color: #FFFFFF;
-  background: #EF4444;
+  background: #FF1744;
 }
 
 .user-output {
@@ -1235,9 +1310,9 @@ button {
 .dimension-feedback strong {
   display: block;
   margin-bottom: 8px;
-  color: #F1F0FF;
+  color: #FFFFFF;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 750;
 }
 
 .user-output p {
@@ -1245,22 +1320,52 @@ button {
   overflow-y: auto;
   margin: 0;
   color: #D9D7E8;
-  background: #080B10;
-  border-radius: 8px;
-  padding: 14px;
+  background: #1A1A1A;
+  border: 1px solid #2A2A2A;
+  border-radius: 10px;
+  padding: 16px;
   line-height: 1.6;
+}
+
+.user-output p::-webkit-scrollbar {
+  width: 6px;
+}
+
+.user-output p::-webkit-scrollbar-thumb {
+  background: #3A3A3A;
+  border-radius: 999px;
+}
+
+.user-output p::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .dimension-feedback {
   display: grid;
-  gap: 14px;
   margin-top: 18px;
+}
+
+.dimension-feedback > div {
+  margin-bottom: 10px;
+  padding: 14px 18px;
+  background: #1A1A1A;
+  border: 1px solid #2A2A2A;
+  border-left: 4px solid;
+  border-radius: 10px;
+}
+
+.dimension-feedback strong {
+  margin-bottom: 6px;
+  color: #F1F0FF;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .dimension-feedback p {
   margin: 0;
-  color: #9CA3AF;
-  line-height: 1.55;
+  color: #D1D5DB;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .answers-list .answer-option {
@@ -1270,8 +1375,6 @@ button {
 .check-button {
   width: 100%;
   margin-top: 20px;
-  padding: 16px;
-  font-size: 16px;
 }
 
 .check-button:disabled {
@@ -1287,25 +1390,28 @@ button {
 
 .feedback {
   margin-top: 18px;
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-weight: 900;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-weight: 700;
 }
 
 .feedback.success {
-  color: #34D399;
-  background: #0D2E1F;
+  color: #16FF6E;
+  background: rgba(22, 255, 110, 0.12);
+  border: 1px solid #16FF6E;
 }
 
 .feedback.error {
-  color: #F87171;
-  background: #2E0D0D;
+  color: #FF1744;
+  background: rgba(255, 23, 68, 0.12);
+  border: 1px solid #FF1744;
 }
 
 .feedback p {
   margin: 8px 0 0;
-  color: #9CA3AF;
-  font-weight: 700;
+  color: #F1F0FF;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .state-card {
@@ -1318,15 +1424,7 @@ button {
 }
 
 .map-back-button {
-  display: block;
   margin: 18px auto 0;
-  padding: 12px 24px;
-  color: #0F0F0F;
-  cursor: pointer;
-  background: #F59E0B;
-  border: 0;
-  border-radius: 10px;
-  font-weight: 950;
 }
 
 .map-back-button:disabled {
