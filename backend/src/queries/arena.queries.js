@@ -22,22 +22,6 @@ const insertSubmission = async (userId, challengeId, promptText, clarityScore, c
             (user_id, challenge_id, prompt_text, clarity_score, context_score,
             specificity_score, composite_score, ai_feedback, submitted_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-        ON CONFLICT (user_id, challenge_id)
-        DO UPDATE SET
-            prompt_text = CASE WHEN EXCLUDED.composite_score > arena_submissions.composite_score 
-                        THEN EXCLUDED.prompt_text ELSE arena_submissions.prompt_text END,
-            clarity_score = CASE WHEN EXCLUDED.composite_score > arena_submissions.composite_score 
-                        THEN EXCLUDED.clarity_score ELSE arena_submissions.clarity_score END,
-            context_score = CASE WHEN EXCLUDED.composite_score > arena_submissions.composite_score 
-                        THEN EXCLUDED.context_score ELSE arena_submissions.context_score END,
-            specificity_score = CASE WHEN EXCLUDED.composite_score > arena_submissions.composite_score 
-                            THEN EXCLUDED.specificity_score ELSE arena_submissions.specificity_score END,
-            composite_score = CASE WHEN EXCLUDED.composite_score > arena_submissions.composite_score 
-                            THEN EXCLUDED.composite_score ELSE arena_submissions.composite_score END,
-            ai_feedback = CASE WHEN EXCLUDED.composite_score > arena_submissions.composite_score 
-                        THEN EXCLUDED.ai_feedback ELSE arena_submissions.ai_feedback END,
-            submitted_at = CASE WHEN EXCLUDED.composite_score > arena_submissions.composite_score 
-                        THEN NOW() ELSE arena_submissions.submitted_at END
         RETURNING *
     `
 

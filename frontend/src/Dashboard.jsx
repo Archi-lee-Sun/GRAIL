@@ -213,8 +213,7 @@ function buildSections(tracks, progress, focusLessonIds) {
     const lessonId = item.lesson_id || item.id || item.lesson_slug
     const shouldShow =
       !focusLessonIds ||
-      focusLessonIds.has(String(lessonId)) ||
-      item.status === 'complete'
+      focusLessonIds.has(String(lessonId))
 
     if (!shouldShow) return
 
@@ -374,7 +373,6 @@ export default function Dashboard() {
   const [showFocusModal, setShowFocusModal] = useState(false)
   const [focusTrack, setFocusTrack] = useState(null)
   const [focusLessonIds, setFocusLessonIds] = useState(null)
-  const [focusError, setFocusError] = useState('')
   const [focusLoading, setFocusLoading] = useState('')
   const mainRef = useRef(null)
   const popupBoundaryRef = useRef(null)
@@ -398,12 +396,18 @@ export default function Dashboard() {
 
   const openFocusModal = async () => {
     setShowFocusModal(true)
-    setFocusError('')
 
     try {
-      await refreshDashboardState()
-    } catch (refreshError) {
-      setFocusError(refreshError.message || 'Could not refresh lesson states')
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${API_BASE}/tracks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setTracks(data.tracks || [])
+      }
+    } catch (trackError) {
+      console.error('Could not refresh tracks:', trackError)
     }
   }
 
@@ -510,7 +514,16 @@ export default function Dashboard() {
   useEffect(() => {
     if (!progress || progress.length === 0) return
 
-    const currentLesson = progress.find((item) => item.status === 'in_progress' || item.status === 'unlocked')
+    const visibleProgress = focusLessonIds
+      ? progress.filter((item) => {
+          const lessonId = item.lesson_id || item.id || item.lesson_slug
+          return focusLessonIds.has(String(lessonId))
+        })
+      : progress
+    const currentLesson =
+      visibleProgress.find((item) => item.status === 'in_progress') ||
+      visibleProgress.find((item) => item.status === 'unlocked')
+
     if (!currentLesson) return
 
     const timeoutId = window.setTimeout(() => {
@@ -521,7 +534,7 @@ export default function Dashboard() {
     }, 300)
 
     return () => window.clearTimeout(timeoutId)
-  }, [progress])
+  }, [focusLessonIds, progress])
 
   useEffect(() => {
     const closeOnOutsideClick = (event) => {
@@ -547,38 +560,52 @@ export default function Dashboard() {
 
   const selectFocusTrack = async (track) => {
     setFocusLoading(track.slug)
-    setFocusError('')
 
     try {
       const token = localStorage.getItem('token')
       const headers = { Authorization: `Bearer ${token}` }
-      const freshProgress = await refreshDashboardState()
       const lessonsResponse = await fetch(`${API_BASE}/tracks/${track.slug}/lessons`, { headers })
       const lessonsData = await lessonsResponse.json()
-      if (!lessonsResponse.ok) throw new Error(lessonsData.message || lessonsData.error || 'Could not load track lessons')
+      if (!lessonsResponse.ok) {
+        throw new Error(lessonsData.message || lessonsData.error || 'Could not load track lessons')
+      }
 
-      const trackLessons = lessonsData.lessons || []
+      const trackLessons = [...(lessonsData.lessons || [])].sort(
+        (a, b) => Number(a.display_order || 0) - Number(b.display_order || 0),
+      )
       const firstLesson = trackLessons[0]
-      if (!firstLesson?.id) throw new Error('No lessons found for this track yet.')
+      if (!firstLesson) {
+        console.warn(`No lessons available for track ${track.slug}`)
+        return
+      }
 
-      const pathResponse = await fetch(`${API_BASE}/users/me/learning-path/${firstLesson.id}`, { headers })
-      const pathData = await pathResponse.json()
-      if (!pathResponse.ok) throw new Error(pathData.message || pathData.error || 'Could not build focus path')
+      const firstLessonId = firstLesson.lesson_id || firstLesson.id
+      let learningPath = []
 
-      const completedIds = freshProgress
-        .filter((lesson) => lesson.status === 'complete')
-        .map((lesson) => String(lesson.lesson_id || lesson.id || lesson.lesson_slug))
+      try {
+        const pathResponse = await fetch(`${API_BASE}/users/me/learning-path/${firstLessonId}`, { headers })
+        const pathData = await pathResponse.json()
+        if (pathResponse.ok && Array.isArray(pathData.learningPath)) {
+          learningPath = pathData.learningPath
+        }
+
+        console.log('Track slug:', track.slug)
+        console.log('First lesson ID:', firstLessonId)
+        console.log('Learning path response:', pathData)
+      } catch (pathError) {
+        console.warn(`Learning path unavailable for ${track.slug}; showing selected track only.`, pathError)
+      }
+
       const visibleIds = new Set([
-        ...(pathData.learningPath || []).map((id) => String(id.lesson_id || id.id || id)),
+        ...learningPath.map((id) => String(id.lesson_id || id.id || id)),
         ...trackLessons.map((lesson) => String(lesson.lesson_id || lesson.id || lesson.slug)),
-        ...completedIds,
       ])
 
       setFocusLessonIds(visibleIds)
       setFocusTrack(track)
       setShowFocusModal(false)
     } catch (focusSelectError) {
-      setFocusError(focusSelectError.message || 'Could not enable focus mode')
+      console.error('Could not select track:', focusSelectError)
     } finally {
       setFocusLoading('')
     }
@@ -784,7 +811,6 @@ export default function Dashboard() {
             >
               SHOW ALL LESSONS
             </button>
-            {focusError && <div className="focus-message error">{focusError}</div>}
           </div>
         </div>
       )}
@@ -1123,19 +1149,6 @@ button {
   border: 0;
   border-radius: 8px;
   font-weight: 950;
-}
-
-.focus-message {
-  margin-top: 16px;
-  color: #FFFFFF;
-  background: ${palette.surface};
-  border-radius: 8px;
-  padding: 12px;
-  line-height: 1.5;
-}
-
-.focus-message.error {
-  color: #F87171;
 }
 
 .map-scroll {

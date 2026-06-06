@@ -12,7 +12,7 @@
     "title": "Code Assistant",
     "description": "Learn to use AI effectively for coding, debugging, and code review.",
     "is_foundation": false,
-    "unlock_after_lesson_count": 6,
+    "unlock_after_lesson_count": null,
     "display_order": 2
   },
   {
@@ -20,7 +20,7 @@
     "title": "Email & Professional Writing",
     "description": "Master prompts for professional communication and writing tasks.",
     "is_foundation": false,
-    "unlock_after_lesson_count": 6,
+    "unlock_after_lesson_count": null,
     "display_order": 3
   },
   {
@@ -28,7 +28,7 @@
     "title": "Decision Making & Strategy",
     "description": "Use AI as a thinking partner for complex decisions and strategy.",
     "is_foundation": false,
-    "unlock_after_lesson_count": 15,
+    "unlock_after_lesson_count": null,
     "display_order": 4
   }
 ]

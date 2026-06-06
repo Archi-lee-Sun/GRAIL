@@ -135,12 +135,16 @@ const gradeStage4 = async (userPrompt, scenario, rubricHints) => {
             - context (0-10): Does the prompt provide sufficient background, role, audience, and situational information needed to complete the task well?
             - specificity (0-10): Does the prompt specify format, tone, length, constraints, and edge cases needed to get a precise and useful output?
 
+            Score only information explicitly present in the student's prompt. The generated output is supporting evidence of prompt performance, but a good output must never compensate for missing instructions in the student's prompt.
+
             Strict grading rules:
             - 9-10: Exceptional. Near perfect prompt, nothing meaningful to improve
             - 7-8: Good. Clear intent, minor improvements possible
             - 5-6: Average. Gets the job done but missing important details
             - 3-4: Weak. Vague, missing context, output is generic
             - 0-2: Poor. Prompt is too generic to produce useful output
+            - Nonsense, random characters, irrelevant text, or a prompt that does not request the scenario task must score 0-1 on every dimension.
+            - A short prompt may score well only if it explicitly contains the information required by the rubric.
 
             Scenario the student was given:
             ${scenario}
@@ -172,6 +176,8 @@ const gradeStage4 = async (userPrompt, scenario, rubricHints) => {
 
         const gradingResponse = await groqClient.chat.completions.create({
             model: "llama-3.3-70b-versatile",
+            temperature: 0,
+            response_format: { type: "json_object" },
             messages : [
                 {role : "system" , content : gradingPrompt},
                 {role : "user" , content : `Scenario: ${scenario}\n\nStudent's prompt: ${userPrompt}\n\nOutput generated: ${userOutput}\n\nRubric hints: ${rubricHints}`}

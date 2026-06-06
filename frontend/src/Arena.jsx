@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom'
 
 const API_BASE = 'http://localhost:3000/api'
 
+function getApiErrorMessage(data, fallback) {
+  if (typeof data?.error === 'string') return data.error
+  if (typeof data?.error?.message === 'string') return data.error.message
+  if (typeof data?.message === 'string') return data.message
+  return fallback
+}
+
 function SwordsIcon({ size = 48 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
@@ -102,6 +109,7 @@ export default function Arena() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [submissionError, setSubmissionError] = useState('')
   const [scoreUpdated, setScoreUpdated] = useState(false)
   const userEntry = useMemo(() => leaderboard.find((entry) => entry.username === user?.username), [leaderboard, user])
   const hasStanding = Boolean(userEntry || result)
@@ -109,7 +117,7 @@ export default function Arena() {
   const refreshLeaderboard = async (challengeId, headers) => {
     const response = await fetch(`${API_BASE}/arena/${challengeId}/leaderboard`, { headers })
     const data = await response.json()
-    if (!response.ok) throw new Error(data.error || 'Could not load leaderboard')
+    if (!response.ok) throw new Error(getApiErrorMessage(data, 'Could not load leaderboard'))
     const rows = (data.leaderBoard || data.leaderboard || []).map(normalizeEntry)
     setLeaderboard(rows)
     return rows
@@ -130,8 +138,8 @@ export default function Arena() {
       .then(async ([challengeResponse, meResponse]) => {
         const challengeData = await challengeResponse.json()
         const meData = await meResponse.json()
-        if (!challengeResponse.ok) throw new Error(challengeData.error || 'Could not load arena challenge')
-        if (!meResponse.ok) throw new Error(meData.error || 'Could not load user')
+        if (!challengeResponse.ok) throw new Error(getApiErrorMessage(challengeData, 'Could not load arena challenge'))
+        if (!meResponse.ok) throw new Error(getApiErrorMessage(meData, 'Could not load user'))
         setUser(meData.user)
         setChallenge(challengeData.current_challenge || null)
         if (challengeData.current_challenge?.id) {
@@ -145,7 +153,7 @@ export default function Arena() {
   const submitPrompt = async () => {
     if (!answer.trim() || !challenge?.id || submitting) return
     setSubmitting(true)
-    setError('')
+    setSubmissionError('')
 
     try {
       const token = localStorage.getItem('token')
@@ -159,13 +167,13 @@ export default function Arena() {
         body: JSON.stringify({ prompt_text: answer }),
       })
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Could not submit prompt')
+      if (!response.ok) throw new Error(getApiErrorMessage(data, 'Could not submit prompt'))
       setResult(data.result)
       await refreshLeaderboard(challenge.id, { Authorization: `Bearer ${token}` })
       setScoreUpdated(true)
       window.setTimeout(() => setScoreUpdated(false), 3000)
     } catch (submitError) {
-      setError(submitError.message || 'Could not submit prompt')
+      setSubmissionError(submitError.message || 'Could not submit prompt')
     } finally {
       setSubmitting(false)
     }
@@ -211,6 +219,7 @@ export default function Arena() {
               <button type="button" className="submit-button" onClick={submitPrompt} disabled={!answer.trim() || submitting}>
                 {submitting ? 'Grading...' : 'SUBMIT PROMPT'}
               </button>
+              {submissionError && <div className="submission-error">{submissionError}</div>}
               <FeedbackCard result={result} />
               {hasStanding && (
                 <div className="standing-card">
@@ -348,6 +357,16 @@ button { font: inherit; }
 .submit-button:disabled {
   cursor: not-allowed;
   opacity: 0.65;
+}
+.submission-error {
+  margin-top: 14px;
+  color: #F87171;
+  background: #2E0D0D;
+  border: 1px solid #7F1D1D;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 700;
 }
 .submission-info-banner {
   margin-bottom: 16px;

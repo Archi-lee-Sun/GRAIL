@@ -28,10 +28,7 @@ const stagetasksnumbers = {
 
 const { 
     getDirectDependents, 
-    checkAllDepsComplete,
-    unlockTrackFirstLesson,
-    getCompletedLessonCount,
-    getTracksWithUnlockThreshold
+    checkAllDepsComplete
 } = require('../queries/graph.queries');
 
 const {
@@ -248,17 +245,6 @@ const completeStage = async (req , res , next) => {
 
             await unlockVaultEntries(userId, lesson.id);
             await updateSRS(userId, lesson.id, 3);
-        }
-
-        const completedCount = await getCompletedLessonCount(userId);
-        const tracksToCheck = await getTracksWithUnlockThreshold();
-        console.log(`Track unlock check: completedCount=${completedCount}`);
-        for (const track of tracksToCheck) {
-            console.log(`Checking track ${track.slug}: threshold=${track.unlock_after_lesson_count}`);
-            if (completedCount >= Number(track.unlock_after_lesson_count)) {
-                console.log(`Unlocking first lesson of ${track.slug}`);
-                await unlockTrackFirstLesson(userId, track.slug);
-            }
         }
 
         return res.json({
