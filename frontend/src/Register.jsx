@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { ThemeToggle } from './theme.jsx'
 
 const API_BASE = 'http://localhost:3000/api'
 
@@ -87,6 +88,7 @@ export default function Register() {
   return (
     <main className="auth-page">
       <style>{authStyles}</style>
+      <ThemeToggle className="auth-theme-toggle" />
       <form className="auth-card" onSubmit={handleSubmit}>
         <AuthLogo />
 

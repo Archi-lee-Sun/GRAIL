@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTheme } from './theme.jsx'
 
 const API_BASE = 'http://localhost:3000/api'
 
@@ -35,8 +36,11 @@ function SwordsIcon({ size = 48 }) {
 }
 
 function ScoreRow({ label, value }) {
+  const { theme } = useTheme()
   const score = Number(value || 0)
-  const color = score >= 7 ? '#16FF6E' : '#FF1744'
+  const color = score >= 7
+    ? (theme === 'light' ? '#16C93D' : '#16FF6E')
+    : (theme === 'light' ? '#E8000D' : '#FF1744')
   return (
     <div className="score-row">
       <div className="score-meta">
@@ -61,6 +65,7 @@ function normalizeFeedback(value) {
 }
 
 function FeedbackCard({ result }) {
+  const { theme } = useTheme()
   if (!result) return null
   const feedback = normalizeFeedback(result.feedback || result.ai_feedback)
   const scores = result.scores || {
@@ -83,7 +88,11 @@ function FeedbackCard({ result }) {
         {['clarity', 'context', 'specificity'].map((key) => (
           <div
             key={key}
-            style={{ borderLeftColor: Number(scores[key] || 0) >= 7 ? '#16FF6E' : '#FF1744' }}
+            style={{
+              borderLeftColor: Number(scores[key] || 0) >= 7
+                ? (theme === 'light' ? '#16C93D' : '#16FF6E')
+                : (theme === 'light' ? '#E8000D' : '#FF1744'),
+            }}
           >
             <strong>{key}</strong>
             <p>{feedback[key] || feedback.summary || 'No feedback returned.'}</p>

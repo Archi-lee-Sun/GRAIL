@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useTheme } from './theme.jsx'
 
 const API_BASE = 'http://localhost:3000/api'
 
@@ -397,8 +398,11 @@ function StageTwoTasks({ tasks, slug, stage, token, onStageComplete, isReplay, o
 }
 
 function ScoreRow({ label, score }) {
+  const { theme } = useTheme()
   const value = Number(score || 0)
-  const fillColor = value >= 7 ? '#16FF6E' : '#FF1744'
+  const fillColor = value >= 7
+    ? (theme === 'light' ? '#16C93D' : '#16FF6E')
+    : (theme === 'light' ? '#E8000D' : '#FF1744')
 
   return (
     <div className="score-row">
@@ -414,6 +418,7 @@ function ScoreRow({ label, score }) {
 }
 
 function GradingResults({ result, dimensions }) {
+  const { theme } = useTheme()
   if (!result) return null
   const composite = Number(result.composite_score || 0)
   const passed = composite >= 7
@@ -445,7 +450,11 @@ function GradingResults({ result, dimensions }) {
         {dimensions.map((dimension) => (
           <div
             key={dimension.key}
-            style={{ borderLeftColor: Number(result.scores?.[dimension.key] || 0) >= 7 ? '#16FF6E' : '#FF1744' }}
+            style={{
+              borderLeftColor: Number(result.scores?.[dimension.key] || 0) >= 7
+                ? (theme === 'light' ? '#16C93D' : '#16FF6E')
+                : (theme === 'light' ? '#E8000D' : '#FF1744'),
+            }}
           >
             <strong>{dimension.label}</strong>
             <p>{getFeedbackText(result.feedback?.[dimension.key])}</p>

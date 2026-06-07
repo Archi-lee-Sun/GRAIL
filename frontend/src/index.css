@@ -2,6 +2,748 @@ body {
   margin: 0;
 }
 
+.theme-toggle {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  margin-left: 12px;
+  padding: 0;
+  place-items: center;
+  color: #F59E0B;
+  cursor: pointer;
+  background: #2D4A2D;
+  border: 2px solid #3D6A3D;
+  border-radius: 50%;
+}
+
+.theme-toggle-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.auth-theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  margin-left: 0;
+}
+
+html.light-mode,
+html.light-mode body,
+html.light-mode #root {
+  color: #1A1A1A;
+  background: #F0EDE6;
+}
+
+.light-mode *,
+.light-mode *::before,
+.light-mode *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Shared light surfaces */
+.light-mode .grail-dashboard,
+.light-mode .lesson-page,
+.light-mode .arena-page,
+.light-mode .leaderboard-page,
+.light-mode .vault-page,
+.light-mode .vault-entry-page,
+.light-mode .auth-page {
+  color: #1A1A1A;
+  background: #F0EDE6;
+}
+
+.light-mode .top-bar,
+.light-mode .lesson-topbar,
+.light-mode .vault-topbar {
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.light-mode .back-button {
+  color: #1A1A1A;
+  background: #F5F3EF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .brand strong span,
+.light-mode .brand strong .brand-ai {
+  color: #7C3AED;
+}
+
+.light-mode .track-title,
+.light-mode .lesson-title,
+.light-mode .vault-title {
+  color: #1A1A1A;
+}
+
+.light-mode .theme-toggle {
+  width: 34px;
+  height: 34px;
+  color: #FFD700;
+  background: #FFFFFF;
+  border: 2px solid #E5E7EB;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.light-mode .theme-toggle:hover {
+  border-color: #E5E7EB;
+}
+
+.light-mode .theme-toggle .moon-icon {
+  color: #FFD700;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+}
+
+.light-mode .streak-stat .stat-icon {
+  width: 28px;
+  height: 30px;
+  filter: drop-shadow(0 0 10px rgba(255, 80, 0, 1)) drop-shadow(0 0 20px rgba(255, 120, 0, 0.7));
+}
+
+.light-mode .streak-stat .stat-icon:hover {
+  transform: scale(1.2);
+}
+
+.light-mode .freeze-stat {
+  color: #0EA5E9;
+}
+
+.light-mode .freeze-stat .stat-icon {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.9));
+}
+
+.light-mode .freeze-stat .stat-icon path {
+  stroke: #0EA5E9;
+}
+
+.light-mode .sidebar {
+  background: #E8E4DC;
+  border-color: #DDD8CE;
+}
+
+.light-mode .nav-card {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.light-mode .nav-card:hover {
+  background: #F5F3EF;
+  border-color: #7C3AED;
+}
+
+.light-mode .nav-card strong {
+  color: #1A1A1A;
+}
+
+.light-mode .nav-card span,
+.light-mode .stage-indicator,
+.light-mode .vault-count {
+  color: #5A5A5A;
+}
+
+.light-mode .nav-card svg {
+  color: #7C3AED;
+}
+
+.light-mode .map-scroll {
+  background: #F0EDE6;
+}
+
+.light-mode .center-state,
+.light-mode .login-empty {
+  color: #1A1A1A;
+  background: #F0EDE6;
+}
+
+.light-mode .lesson-island {
+  background: #FAF8F4;
+  border-color: #DDD8CE;
+  box-shadow: 0 4px 20px rgba(73, 59, 43, 0.12);
+}
+
+.light-mode .lesson-name-label {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+
+.light-mode .track-divider,
+.light-mode .lesson-transition-label {
+  color: #5A5A5A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .mushroom-current .mushroom-cap {
+  background: linear-gradient(160deg, #FFB3B8 0%, #E8000D 35%, #940009 100%);
+  box-shadow: 0 8px 0 #940009, 0 10px 8px rgba(0, 0, 0, 0.24), inset 0 2px 0 rgba(255, 255, 255, 0.5);
+}
+
+.light-mode .mushroom-locked .mushroom-cap {
+  background: linear-gradient(160deg, #EEEAE3 0%, #C8C2B8 40%, #8D867C 100%);
+  box-shadow: 0 8px 0 #8D867C, 0 10px 8px rgba(0, 0, 0, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.65);
+}
+
+.light-mode .lesson-popup,
+.light-mode .focus-modal,
+.light-mode .profile-menu {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+
+.light-mode .focus-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.light-mode .focus-modal {
+  background: #FFFFFF;
+  border-color: #E5E7EB;
+}
+
+.light-mode .focus-modal p {
+  color: #5A5A5A;
+}
+
+.light-mode .focus-close {
+  color: #5A5A5A;
+}
+
+.light-mode .focus-track-list button {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+}
+
+.light-mode .focus-track-list button:hover {
+  background: #F3F0FF;
+  border-color: #7C3AED;
+}
+
+.light-mode .focus-track-list button span {
+  color: #1A1A1A;
+  font-weight: 700;
+}
+
+.light-mode .focus-track-list button strong {
+  color: #F59E0B;
+  font-weight: 700;
+}
+
+.light-mode .focus-track-list::-webkit-scrollbar-track {
+  background: #F5F3EF;
+}
+
+.light-mode .focus-track-list::-webkit-scrollbar-thumb {
+  background: #C8C2B8;
+}
+
+.light-mode .focus-clear {
+  color: #1A1A1A;
+  background: #F59E0B;
+  font-weight: 800;
+}
+
+.light-mode .spinner {
+  border-color: rgba(124, 58, 237, 0.2);
+  border-top-color: #7C3AED;
+}
+
+.light-mode .focus-modal h2,
+.light-mode .profile-name,
+.light-mode .lesson-popup h3 {
+  color: #1A1A1A;
+}
+
+/* Auth */
+.light-mode .auth-card {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #E5E7EB;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
+}
+
+.light-mode .auth-logo strong {
+  color: #1A1A1A;
+}
+
+.light-mode .auth-card label span,
+.light-mode .auth-link {
+  color: #6B7280;
+}
+
+.light-mode .auth-card input {
+  color: #1A1A1A;
+  background: #F5F3EF;
+  border-color: #DDD8CE;
+}
+
+/* Lesson */
+.light-mode .concept-card,
+.light-mode .task-card,
+.light-mode .prompt-stage-card,
+.light-mode .stage-four-card,
+.light-mode .challenge-card,
+.light-mode .state-card,
+.light-mode .entry-card,
+.light-mode .vault-empty {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.light-mode .prompt-stage-card,
+.light-mode .stage-four-card {
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .prompt-stage-card .scenario-block,
+.light-mode .prompt-stage-card .scenario-card {
+  background: #F5F3EF;
+  border: 1px solid #DDD8CE;
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.light-mode .prompt-stage-card .scenario-block span,
+.light-mode .prompt-stage-card .scenario-card span {
+  color: #F59E0B;
+  font-weight: 700;
+}
+
+.light-mode .prompt-stage-card .scenario-block p,
+.light-mode .prompt-stage-card .scenario-card p {
+  color: #1A1A1A;
+}
+
+.light-mode .prompt-stage-card textarea,
+.light-mode .stage-four-card textarea {
+  color: #1A1A1A;
+  background: #F5F3EF;
+  border-color: #C8C2B8;
+}
+
+.light-mode .tips-card {
+  background: #F3F0FF;
+  border: 1px solid #DDD0FF;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.light-mode .tips-card strong {
+  color: #5B21B6;
+  font-weight: 700;
+}
+
+.light-mode .tips-card ul,
+.light-mode .tips-card li {
+  color: #4C1D95;
+}
+
+.light-mode .task-progress {
+  color: #6B7280;
+  background: transparent;
+  font-size: 13px;
+}
+
+.light-mode .progress-track {
+  height: 6px;
+  background: #E5E7EB;
+  border-radius: 3px;
+}
+
+.light-mode .progress-track span {
+  background: #7C3AED;
+}
+
+.light-mode .concept-card h2,
+.light-mode .concept-card h3,
+.light-mode .task-card h2,
+.light-mode .task-card h3,
+.light-mode .entry-card h1,
+.light-mode .entry-card h2,
+.light-mode .entry-card h3,
+.light-mode .vault-header h1,
+.light-mode .vault-empty h2 {
+  color: #1A1A1A;
+}
+
+.light-mode .concept-card p,
+.light-mode .task-card p,
+.light-mode .entry-markdown p,
+.light-mode .entry-markdown blockquote,
+.light-mode .vault-header p,
+.light-mode .vault-empty p {
+  color: #5A5A5A;
+}
+
+.light-mode .concept-content {
+  color: #1A1A1A;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+}
+
+.light-mode .concept-content h1,
+.light-mode .concept-content h2,
+.light-mode .concept-content h3 {
+  margin-bottom: 12px;
+  color: #1A1A1A;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.light-mode .concept-content p,
+.light-mode .concept-content blockquote,
+.light-mode .concept-content li {
+  color: #1A1A1A;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.light-mode .concept-content p {
+  margin-bottom: 16px;
+}
+
+.light-mode .concept-content strong {
+  color: #1A1A1A;
+  font-weight: 700;
+}
+
+.light-mode .concept-content code {
+  color: #B45309;
+  background: #F5F3EF;
+  border: 1px solid #DDD8CE;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.light-mode .concept-content pre {
+  background: #F5F3EF;
+  border: 1px solid #DDD8CE;
+}
+
+.light-mode .read-more-fade {
+  background: linear-gradient(transparent, #FFFFFF);
+}
+
+.light-mode .prompt-block,
+.light-mode .answer-option {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .prompt-block:hover,
+.light-mode .answer-option:hover {
+  background: #F5F3EF;
+  border-color: #7C3AED;
+}
+
+.light-mode .prompt-block.selected,
+.light-mode .answer-option.selected {
+  background: #F3F0FF;
+  border-color: #7C3AED;
+}
+
+.light-mode .prompt-block.correct,
+.light-mode .answer-option.correct {
+  background: rgba(22, 201, 61, 0.1);
+  border-color: #16C93D;
+}
+
+.light-mode .prompt-block.wrong,
+.light-mode .answer-option.wrong {
+  background: rgba(232, 0, 13, 0.08);
+  border-color: #E8000D;
+}
+
+.light-mode .prompt-block code,
+.light-mode .answer-option,
+.light-mode .explanation {
+  color: #1A1A1A;
+}
+
+.light-mode .feedback.success {
+  color: #15803D;
+  background: rgba(22, 201, 61, 0.12);
+  border-color: #16C93D;
+}
+
+.light-mode .feedback.error {
+  color: #E8000D;
+  background: rgba(232, 0, 13, 0.1);
+  border-color: #E8000D;
+}
+
+.light-mode .feedback p {
+  color: #1A1A1A;
+}
+
+.light-mode textarea,
+.light-mode input {
+  color: #1A1A1A;
+  background: #F5F3EF;
+  border-color: #C8C2B8;
+}
+
+.light-mode textarea:focus,
+.light-mode input:focus {
+  border-color: #7C3AED;
+}
+
+.light-mode .bad-prompt {
+  color: #1A1A1A;
+  background: #F5F3EF;
+  border: 1px solid #DDD8CE;
+  border-radius: 10px;
+}
+
+.light-mode .bad-prompt code {
+  color: #1A1A1A;
+}
+
+.light-mode .check-button:disabled {
+  color: #9CA3AF;
+  background: #E5E7EB;
+  box-shadow: none;
+}
+
+.light-mode .check-button:not(:disabled),
+.light-mode .check-button.ready {
+  color: #1A1A1A;
+  background: #F59E0B;
+  font-weight: 800;
+}
+
+.light-mode .replay-banner,
+.light-mode .already-passed-banner {
+  color: #92400E;
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  font-weight: 600;
+}
+
+.light-mode .xp-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.light-mode .xp-card {
+  padding: 40px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+}
+
+.light-mode .xp-amount {
+  color: #F59E0B;
+  font-size: 42px;
+  font-weight: 800;
+}
+
+.light-mode .stage-complete-title {
+  color: #1A1A1A;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.light-mode .streak-gain {
+  color: #1A1A1A;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.light-mode .xp-card button {
+  padding: 14px 32px;
+  color: #1A1A1A;
+  background: #F59E0B;
+  border-radius: 10px;
+  font-weight: 800;
+}
+
+.light-mode .grading-results,
+.light-mode .feedback-card {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .grading-results h2,
+.light-mode .feedback-card h2,
+.light-mode .score-meta span {
+  color: #1A1A1A;
+}
+
+.light-mode .score-bar {
+  background: #E5E7EB;
+}
+
+.light-mode .dimension-feedback > div {
+  background: #F5F3EF;
+  border-top-color: #DDD8CE;
+  border-right-color: #DDD8CE;
+  border-bottom-color: #DDD8CE;
+}
+
+.light-mode .dimension-feedback strong {
+  color: #1A1A1A;
+}
+
+.light-mode .dimension-feedback p {
+  color: #5A5A5A;
+}
+
+.light-mode .user-output p {
+  color: #1A1A1A;
+  background: #F5F3EF;
+  border-color: #DDD8CE;
+}
+
+/* Arena */
+.light-mode .arena-header h1,
+.light-mode .leaderboard-header h1 {
+  color: #1A1A1A;
+}
+
+.light-mode .arena-header p,
+.light-mode .leaderboard-header p {
+  color: #5A5A5A;
+}
+
+.light-mode .challenge-card {
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .challenge-card p {
+  color: #1A1A1A;
+}
+
+.light-mode .submission-area textarea {
+  color: #1A1A1A;
+  background: #F5F3EF;
+  border-color: #C8C2B8;
+}
+
+.light-mode .submission-area textarea:focus {
+  border-color: #7C3AED;
+}
+
+.light-mode .submission-info,
+.light-mode .standing-card {
+  color: #5A5A5A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .submission-info-banner {
+  color: #5B21B6;
+  background: #F3F0FF;
+  border: 1px solid #C4B5FD;
+  border-radius: 10px;
+}
+
+.light-mode .submission-info-banner.updated {
+  color: #15803D;
+}
+
+/* Leaderboard */
+.light-mode .rank-row {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+}
+
+.light-mode .rank-row.rank-1 {
+  border-left-color: #FFD700;
+}
+
+.light-mode .rank-row.rank-2 {
+  border-left-color: #9CA3AF;
+}
+
+.light-mode .rank-row.rank-3 {
+  border-left-color: #CD7F32;
+}
+
+.light-mode .rank-1 .username {
+  color: #B45309;
+}
+
+.light-mode .rank-2 .username {
+  color: #374151;
+}
+
+.light-mode .rank-3 .username {
+  color: #92400E;
+}
+
+.light-mode .rank-row:not(.rank-1):not(.rank-2):not(.rank-3) .username {
+  color: #1A1A1A;
+}
+
+.light-mode .rank-row.current-user {
+  border-color: #7C3AED;
+}
+
+/* Vault */
+.light-mode .vault-card {
+  color: #1A1A1A;
+  background: #FFFFFF;
+  border-color: #DDD8CE;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.light-mode .vault-card:hover {
+  border-color: #7C3AED;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.15);
+}
+
+.light-mode .vault-card span,
+.light-mode .vault-card em {
+  color: #7C3AED;
+}
+
+.light-mode .vault-card strong {
+  color: #1A1A1A;
+}
+
+.light-mode .vault-card p {
+  color: #5A5A5A;
+}
+
+.light-mode .entry-markdown code,
+.light-mode .entry-section code {
+  color: #B45309;
+}
+
+.light-mode .entry-markdown pre,
+.light-mode .entry-section pre {
+  background: #F5F3EF;
+  border: 1px solid #DDD8CE;
+}
+
+.light-mode .entry-section {
+  border-color: #DDD8CE;
+}
+
 input[type='password']::-ms-reveal,
 input[type='password']::-ms-clear {
   display: none;

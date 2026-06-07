@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ThemeToggle, useTheme } from './theme.jsx'
 
 const API_BASE = 'http://localhost:3000/api'
 const lessonTrackFallback = {
@@ -413,6 +414,7 @@ function sortDashboardProgress(items = []) {
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const { theme } = useTheme()
   const [user, setUser] = useState(null)
   const [tracks, setTracks] = useState([])
   const [progress, setProgress] = useState([])
@@ -696,6 +698,7 @@ export default function Dashboard() {
           <button type="button" className="avatar" onClick={() => setShowProfileMenu((value) => !value)}>
             {(user?.username || 'G').charAt(0).toUpperCase()}
           </button>
+          <ThemeToggle />
           {showProfileMenu && (
             <div className="profile-menu">
               <div className="profile-name">{user?.username || 'Player'}</div>
@@ -768,7 +771,7 @@ export default function Dashboard() {
                   key={`${segment.id}-base`}
                   d={segment.d}
                   fill="none"
-                  stroke={palette.path}
+                  stroke={theme === 'light' ? '#C4B09A' : palette.path}
                   strokeWidth="36"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -779,7 +782,7 @@ export default function Dashboard() {
                   key={`${segment.id}-highlight`}
                   d={segment.d}
                   fill="none"
-                  stroke="#7A5C4A"
+                  stroke={theme === 'light' ? '#D8C8B5' : '#7A5C4A'}
                   strokeWidth="20"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -954,6 +957,34 @@ button {
   font-size: 20px;
   font-weight: 700;
   text-align: center;
+}
+
+.theme-toggle {
+  position: static;
+  display: grid;
+  flex: 0 0 34px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-left: 12px;
+  padding: 0;
+  color: #F59E0B;
+  cursor: pointer;
+  background: #2D4A2D;
+  border: 2px solid #3D6A3D;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.06);
+  border-color: #7C3AED;
+}
+
+.theme-toggle-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 .stats {
