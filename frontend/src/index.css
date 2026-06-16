@@ -144,13 +144,13 @@ html.light-mode #root {
 }
 
 .light-mode .nav-card strong {
-  color: #1A1A1A;
+  color: #183018;
 }
 
 .light-mode .nav-card span,
 .light-mode .stage-indicator,
 .light-mode .vault-count {
-  color: #5A5A5A;
+  color: #5D6E5D;
 }
 
 .light-mode .nav-card svg {
@@ -165,6 +165,34 @@ html.light-mode #root {
 .light-mode .login-empty {
   color: #1A1A1A;
   background: #F0EDE6;
+}
+
+.light-mode .stat-tooltip {
+  color: #F1F0FF;
+  background: #1A1A1A;
+}
+
+.light-mode .stat-tooltip::after {
+  background: #1A1A1A;
+}
+
+.light-mode .stat-tooltip strong {
+  color: #F1F0FF;
+}
+
+.light-mode .stat-tooltip span {
+  color: #D1D5DB;
+}
+
+.light-mode .locked-filter-banner {
+  color: #92400E;
+  background: #FEF3C7;
+  border-color: #F59E0B;
+}
+
+.light-mode .locked-filter-banner button {
+  color: #1A1A1A;
+  background: #F59E0B;
 }
 
 .light-mode .lesson-island {
@@ -236,6 +264,10 @@ html.light-mode #root {
 .light-mode .focus-track-list button span {
   color: #1A1A1A;
   font-weight: 700;
+}
+
+.light-mode .focus-track-list button em {
+  color: #5A5A5A;
 }
 
 .light-mode .focus-track-list button strong {

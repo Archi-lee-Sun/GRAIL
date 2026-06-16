@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 const getUserById = async (id) => {
     const query = `
-        SELECT id, username, email, xp, level, streak_count, created_at 
+        SELECT id, username, email, xp, level, streak_count, streak_freeze_count, last_active_date, created_at 
         FROM users 
         WHERE id = $1
     `;

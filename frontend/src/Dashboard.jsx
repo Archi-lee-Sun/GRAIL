@@ -147,6 +147,15 @@ function FreezeStatIcon() {
   )
 }
 
+function StatTooltip({ title, description }) {
+  return (
+    <div className="stat-tooltip">
+      <strong>{title}</strong>
+      <span>{description}</span>
+    </div>
+  )
+}
+
 function NodeStageIcon({ stage }) {
   if (stage === 1) {
     return (
@@ -308,7 +317,8 @@ function getStageState(lesson, stage) {
   return 'locked'
 }
 
-function buildMapLayout(sections) {
+function buildMapLayout(sections, options = {}) {
+  const { showLockedFilterMessage = false } = options
   const nodes = []
   const lessonLabels = []
   const pathSegments = []
@@ -321,6 +331,7 @@ function buildMapLayout(sections) {
   const titleGap = 51
   let y = 104
   let globalLessonNumber = 1
+  let lockedBannerPlaced = false
 
   sections.forEach((section) => {
     const sectionStartY = y - 72
@@ -328,7 +339,9 @@ function buildMapLayout(sections) {
     section.lessons.forEach((lesson) => {
       const lessonNodeIndexes = []
       const titleY = y
-      const islandTop = titleY + titleGap
+      const showLockedBanner = showLockedFilterMessage && !lockedBannerPlaced
+      const lockedBannerSpace = showLockedBanner ? 138 : 0
+      const islandTop = titleY + titleGap + lockedBannerSpace
       const firstNodeY = islandTop + 96
       const islandHeight = 560
 
@@ -363,7 +376,9 @@ function buildMapLayout(sections) {
         y: titleY,
         width: islandWidth,
         height: islandHeight,
+        showLockedBanner,
       })
+      lockedBannerPlaced = lockedBannerPlaced || showLockedBanner
       pathSegments.push({
         id: lesson.slug || `${section.slug}-${globalLessonNumber}`,
         d: buildSmoothPath(pathNodes),
@@ -418,35 +433,20 @@ export default function Dashboard() {
   const [user, setUser] = useState(null)
   const [tracks, setTracks] = useState([])
   const [progress, setProgress] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('token')))
   const [error, setError] = useState('')
   const [selectedLesson, setSelectedLesson] = useState(null)
   const [currentTrack, setCurrentTrack] = useState('Foundation')
-  const [hasToken, setHasToken] = useState(true)
+  const [hasToken] = useState(() => Boolean(localStorage.getItem('token')))
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showFocusModal, setShowFocusModal] = useState(false)
   const [focusTrack, setFocusTrack] = useState(null)
   const [focusLessonIds, setFocusLessonIds] = useState(null)
   const [focusLoading, setFocusLoading] = useState('')
+  const [hoveredStat, setHoveredStat] = useState(null)
   const mainRef = useRef(null)
   const popupBoundaryRef = useRef(null)
   const trackSentinelRefs = useRef({})
-
-  const refreshDashboardState = async () => {
-    const token = localStorage.getItem('token')
-    if (!token) throw new Error('Missing auth token')
-
-    const response = await fetch(`${API_BASE}/users/me/dashboard`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    const data = await response.json()
-    if (!response.ok) throw new Error(data.message || data.error || 'Could not refresh dashboard')
-
-    const sortedProgress = sortDashboardProgress(data.progress || [])
-    setUser(data.user)
-    setProgress(sortedProgress)
-    return sortedProgress
-  }
 
   const openFocusModal = async () => {
     setShowFocusModal(true)
@@ -473,8 +473,6 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
-      setHasToken(false)
-      setLoading(false)
       return
     }
 
@@ -500,11 +498,19 @@ export default function Dashboard() {
   }, [])
 
   const sections = useMemo(() => buildSections(tracks, progress, focusLessonIds), [tracks, progress, focusLessonIds])
-  const mapLayout = useMemo(() => buildMapLayout(sections), [sections])
-
-  useEffect(() => {
-    if (sections[0]?.title) setCurrentTrack(sections[0].title)
-  }, [sections])
+  const visibleProgress = useMemo(() => (
+    focusLessonIds
+      ? progress.filter((item) => {
+          const lessonId = item.lesson_id || item.id || item.lesson_slug
+          return focusLessonIds.has(String(lessonId))
+        })
+      : progress
+  ), [focusLessonIds, progress])
+  const shouldShowLockedFilterMessage = Boolean(focusTrack && visibleProgress.length && visibleProgress.every((item) => item.status === 'locked'))
+  const mapLayout = useMemo(
+    () => buildMapLayout(sections, { showLockedFilterMessage: shouldShowLockedFilterMessage }),
+    [sections, shouldShowLockedFilterMessage],
+  )
 
   useEffect(() => {
     const main = mainRef.current
@@ -566,14 +572,8 @@ export default function Dashboard() {
   }, [sections])
 
   useEffect(() => {
-    if (!progress || progress.length === 0) return
+    if (!visibleProgress.length) return
 
-    const visibleProgress = focusLessonIds
-      ? progress.filter((item) => {
-          const lessonId = item.lesson_id || item.id || item.lesson_slug
-          return focusLessonIds.has(String(lessonId))
-        })
-      : progress
     const currentLesson =
       visibleProgress.find((item) => item.status === 'in_progress') ||
       visibleProgress.find((item) => item.status === 'unlocked')
@@ -588,7 +588,28 @@ export default function Dashboard() {
     }, 300)
 
     return () => window.clearTimeout(timeoutId)
-  }, [focusLessonIds, progress])
+  }, [visibleProgress])
+
+  const resetFocusFilter = () => {
+    setFocusTrack(null)
+    setFocusLessonIds(null)
+    setShowFocusModal(false)
+  }
+
+  const isTrackLocked = (trackSlug) => {
+    const trackProgress = progress.filter((item) => item.track_slug === trackSlug)
+    return trackProgress.length > 0 && trackProgress.every((item) => item.status === 'locked')
+  }
+
+  const hasCompletedLessonInTrack = (trackSlug) => (
+    progress.some((item) => item.track_slug === trackSlug && item.status === 'complete')
+  )
+
+  const shouldShowTrackUnlockLabel = (track) => (
+    track.is_foundation === false &&
+    isTrackLocked(track.slug) &&
+    !hasCompletedLessonInTrack(track.slug)
+  )
 
   useEffect(() => {
     const closeOnOutsideClick = (event) => {
@@ -689,9 +710,33 @@ export default function Dashboard() {
         </div>
         <div className="track-title">{currentTrack}</div>
         <div className="stats">
-          <span className="stat-premium streak-stat"><FireStatIcon />{user?.streak_count ?? 0}</span>
-          <span className="stat-premium xp-stat"><DiamondStatIcon />{user?.xp ?? 0}</span>
-          <span className="stat-premium freeze-stat"><FreezeStatIcon />{user?.streak_freeze_count ?? 0}</span>
+          <span className="stat-premium streak-stat" onMouseEnter={() => setHoveredStat('streak')} onMouseLeave={() => setHoveredStat(null)}>
+            <FireStatIcon />{user?.streak_count ?? 0}
+            {hoveredStat === 'streak' && (
+              <StatTooltip
+                title="Daily Streak"
+                description="Complete at least one lesson stage every day to keep your streak alive."
+              />
+            )}
+          </span>
+          <span className="stat-premium xp-stat" onMouseEnter={() => setHoveredStat('xp')} onMouseLeave={() => setHoveredStat(null)}>
+            <DiamondStatIcon />{user?.xp ?? 0}
+            {hoveredStat === 'xp' && (
+              <StatTooltip
+                title="Experience Points"
+                description="Earn XP by completing lesson stages and arena challenges. XP determines your level."
+              />
+            )}
+          </span>
+          <span className="stat-premium freeze-stat" onMouseEnter={() => setHoveredStat('freeze')} onMouseLeave={() => setHoveredStat(null)}>
+            <FreezeStatIcon />{user?.streak_freeze_count ?? 0}
+            {hoveredStat === 'freeze' && (
+              <StatTooltip
+                title="Streak Freezes"
+                description="A freeze protects your streak if you miss a day. Earn freezes by completing lessons."
+              />
+            )}
+          </span>
           <span><b>🔥</b>{user?.streak_count ?? 0}</span>
           <span><b>💎</b>{user?.xp ?? 0}</span>
           <span className="freeze"><b>❄️</b>{user?.streak_freeze_count ?? 0}</span>
@@ -755,6 +800,13 @@ export default function Dashboard() {
                 }}
               >
                 <div className="lesson-name-label">{island.title}</div>
+                {island.showLockedBanner && (
+                  <div className="locked-filter-banner" onClick={(event) => event.stopPropagation()}>
+                    <strong>Complete Foundation lessons first</strong>
+                    <span>Complete the Foundation track to unlock.</span>
+                    <button type="button" onClick={resetFocusFilter}>SHOW ALL LESSONS</button>
+                  </div>
+                )}
                 <div
                   className="lesson-island"
                   style={{
@@ -841,10 +893,10 @@ export default function Dashboard() {
               {(tracks.length
                 ? [...tracks].sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0))
                 : [
-                    { slug: 'foundation', title: 'Foundation' },
-                    { slug: 'code-assistant', title: 'Code Assistant' },
-                    { slug: 'email-writing', title: 'Email & Professional Writing' },
-                    { slug: 'decision-making', title: 'Decision Making & Strategy' },
+                    { slug: 'foundation', title: 'Foundation', is_foundation: true },
+                    { slug: 'code-assistant', title: 'Code Assistant', is_foundation: false },
+                    { slug: 'email-writing', title: 'Email & Professional Writing', is_foundation: false },
+                    { slug: 'decision-making', title: 'Decision Making & Strategy', is_foundation: false },
                   ]
               ).map((track) => (
                 <button
@@ -853,7 +905,12 @@ export default function Dashboard() {
                   onClick={() => selectFocusTrack(track)}
                   disabled={Boolean(focusLoading)}
                 >
-                  <span>{track.title}</span>
+                  <span>
+                    {track.title}
+                    {shouldShowTrackUnlockLabel(track) && (
+                      <em>Complete the Foundation track to unlock</em>
+                    )}
+                  </span>
                   <strong>{focusLoading === track.slug ? 'Loading...' : 'Select'}</strong>
                 </button>
               ))}
@@ -861,11 +918,7 @@ export default function Dashboard() {
             <button
               type="button"
               className="focus-clear"
-              onClick={() => {
-                setFocusTrack(null)
-                setFocusLessonIds(null)
-                setShowFocusModal(false)
-              }}
+              onClick={resetFocusFilter}
             >
               SHOW ALL LESSONS
             </button>
@@ -1001,10 +1054,58 @@ button {
 }
 
 .stats span {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   font-weight: 800;
+  overflow: visible;
+}
+
+.stat-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 9999;
+  width: 220px;
+  max-width: 220px;
+  margin-top: 8px;
+  padding: 10px 14px;
+  transform: translateX(-50%);
+  color: #1A1A1A;
+  background: #F1F0FF;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  text-align: left;
+}
+
+.stat-tooltip::after {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
+  background: #F1F0FF;
+}
+
+.stat-tooltip strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #1A1A1A;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stat-tooltip span {
+  display: block;
+  max-width: 200px;
+  color: #4B5563;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
 .stats > span:not(.stat-premium) {
@@ -1138,7 +1239,7 @@ button {
 .nav-card strong {
   display: block;
   width: 100%;
-  color: #FFFFFF;
+  color: #EEF7EE;
   font-size: 14px;
   line-height: 16px;
   font-weight: 900;
@@ -1146,7 +1247,7 @@ button {
 }
 
 .nav-card span {
-  color: ${palette.muted};
+  color: #B7C8B7;
   font-size: 11px;
   line-height: 13px;
   font-weight: 650;
@@ -1248,7 +1349,16 @@ button {
 }
 
 .focus-track-list span {
+  display: grid;
+  gap: 4px;
   font-weight: 900;
+}
+
+.focus-track-list em {
+  color: ${palette.muted};
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 650;
 }
 
 .focus-track-list strong {
@@ -1286,6 +1396,48 @@ button {
   flex: 0 0 780px;
   width: 780px;
   padding-bottom: 120px;
+}
+
+.locked-filter-banner {
+  position: relative;
+  z-index: 40;
+  display: grid;
+  width: min(520px, calc(100% - 48px));
+  gap: 8px;
+  margin: 16px auto 24px;
+  padding: 16px 20px;
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid #F59E0B;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.locked-filter-banner strong {
+  color: inherit;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.locked-filter-banner span {
+  color: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.locked-filter-banner button {
+  justify-self: center;
+  margin-top: 4px;
+  padding: 10px 18px;
+  color: #0F0F0F;
+  cursor: pointer;
+  background: ${palette.amber};
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 950;
 }
 
 .path-layer {
