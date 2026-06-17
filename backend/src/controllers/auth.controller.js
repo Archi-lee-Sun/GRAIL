@@ -8,13 +8,49 @@ const {
 } = require('../queries/auth.queries');
 const { BCRYPT_ROUNDS, JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
 const { getUserById } = require('../queries/users.queries');
+const { sendVerificationCode } = require('../services/email.service');
+const { generateCode, verifyCode } = require('../services/verification.service');
+
+const sendVerification = async (req, res, next) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'email required' });
+    }
+
+    try {
+        if (await getUserByEmail(email)) {
+            return res.status(400).json({ error: 'Email already registered' });
+        }
+
+        const code = generateCode(email);
+        await sendVerificationCode(email, code);
+        return res.json({ message: 'Verification code sent' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const verifyEmailCode = async (req, res) => {
+    const { email, code } = req.body;
+
+    if (verifyCode(email, code)) {
+        return res.json({ verified: true });
+    }
+
+    return res.status(400).json({ error: 'Invalid or expired code' });
+};
 
 
 const register = async (req , res , next) => {
-    const { email, username, password } = req.body;
+    const { email, username, password, code } = req.body;
     
     if (!email || !username || !password){
         return res.status(400).json({ error: 'email, username, password required' });
+    }
+
+    if (!verifyCode(email, code)) {
+        return res.status(400).json({ error: 'Email not verified' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -115,6 +151,8 @@ const getMe = async (req, res, next) => {
 
 
 module.exports = { 
+    sendVerification,
+    verifyEmailCode,
     register,
     login ,
     getMe

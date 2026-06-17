@@ -147,9 +147,26 @@ function FreezeStatIcon() {
   )
 }
 
-function StatTooltip({ title, description }) {
+function StatTooltip({ title, description, theme }) {
+  const isLightMode = theme === 'light'
+  const tooltipStyle = {
+    '--stat-tooltip-bg': isLightMode ? '#FFFFFF' : '#1F361F',
+    '--stat-tooltip-border': isLightMode ? '#E5E7EB' : '#2D4A2D',
+    '--stat-tooltip-title': isLightMode ? '#1A1A1A' : '#F1F0FF',
+    '--stat-tooltip-description': isLightMode ? '#6B7280' : '#9CA3AF',
+    '--stat-tooltip-shadow': isLightMode
+      ? '0 4px 16px rgba(0,0,0,0.12)'
+      : '0 4px 16px rgba(0,0,0,0.4)',
+    color: isLightMode ? '#1A1A1A' : '#F1F0FF',
+    background: isLightMode ? '#FFFFFF' : '#1F361F',
+    border: `1px solid ${isLightMode ? '#E5E7EB' : '#2D4A2D'}`,
+    boxShadow: isLightMode
+      ? '0 4px 16px rgba(0,0,0,0.12)'
+      : '0 4px 16px rgba(0,0,0,0.4)',
+  }
+
   return (
-    <div className="stat-tooltip">
+    <div className="stat-tooltip" style={tooltipStyle}>
       <strong>{title}</strong>
       <span>{description}</span>
     </div>
@@ -714,6 +731,7 @@ export default function Dashboard() {
             <FireStatIcon />{user?.streak_count ?? 0}
             {hoveredStat === 'streak' && (
               <StatTooltip
+                theme={theme}
                 title="Daily Streak"
                 description="Complete at least one lesson stage every day to keep your streak alive."
               />
@@ -723,6 +741,7 @@ export default function Dashboard() {
             <DiamondStatIcon />{user?.xp ?? 0}
             {hoveredStat === 'xp' && (
               <StatTooltip
+                theme={theme}
                 title="Experience Points"
                 description="Earn XP by completing lesson stages and arena challenges. XP determines your level."
               />
@@ -732,6 +751,7 @@ export default function Dashboard() {
             <FreezeStatIcon />{user?.streak_freeze_count ?? 0}
             {hoveredStat === 'freeze' && (
               <StatTooltip
+                theme={theme}
                 title="Streak Freezes"
                 description="A freeze protects your streak if you miss a day. Earn freezes by completing lessons."
               />
@@ -1072,10 +1092,11 @@ button {
   margin-top: 8px;
   padding: 10px 14px;
   transform: translateX(-50%);
-  color: #1A1A1A;
-  background: #F1F0FF;
+  color: var(--stat-tooltip-title, #F1F0FF);
+  background: var(--stat-tooltip-bg, #1F361F);
+  border: 1px solid var(--stat-tooltip-border, #2D4A2D);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--stat-tooltip-shadow, 0 4px 16px rgba(0, 0, 0, 0.4));
   pointer-events: none;
   text-align: left;
 }
@@ -1088,13 +1109,13 @@ button {
   height: 12px;
   content: "";
   transform: translateX(-50%) rotate(45deg);
-  background: #F1F0FF;
+  background: var(--stat-tooltip-bg, #1F361F);
 }
 
 .stat-tooltip strong {
   display: block;
   margin-bottom: 4px;
-  color: #1A1A1A;
+  color: var(--stat-tooltip-title, #F1F0FF);
   font-size: 12px;
   font-weight: 700;
 }
@@ -1102,7 +1123,7 @@ button {
 .stat-tooltip span {
   display: block;
   max-width: 200px;
-  color: #4B5563;
+  color: var(--stat-tooltip-description, #9CA3AF);
   font-size: 12px;
   line-height: 1.5;
   font-weight: 400;

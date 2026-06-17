@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ThemeToggle } from './theme.jsx'
 
 const API_BASE = 'http://localhost:3000/api'
@@ -52,23 +52,67 @@ function EyeIcon({ open }) {
 
 export default function Register() {
   const navigate = useNavigate()
+  const registrationStartedRef = useRef(false)
+  const [step, setStep] = useState(1)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [verificationCode, setVerificationCode] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+  const validateRegistrationForm = () => {
     setError('')
-    setLoading(true)
+    setPasswordError('')
 
+    if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match')
+      return false
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('Invalid email format')
+      return false
+    }
+
+    return true
+  }
+
+  const sendVerification = async () => {
     try {
+      setLoading(true)
+      const response = await fetch(`${API_BASE}/auth/send-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not send verification code')
+      }
+
+      setStep(2)
+    } catch (verificationError) {
+      setError(verificationError.message || 'Could not send verification code')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const registerAccount = useCallback(async () => {
+    try {
+      setError('')
+      setLoading(true)
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, code: verificationCode }),
       })
       const data = await response.json()
 
@@ -76,13 +120,59 @@ export default function Register() {
         throw new Error(data.error || 'Registration failed')
       }
 
-      localStorage.setItem('token', data.token)
-      navigate('/dashboard')
+      navigate('/', { state: { successMessage: 'Account created! Please log in.' } })
     } catch (registerError) {
+      setStep(1)
+      registrationStartedRef.current = false
       setError(registerError.message || 'Registration failed')
     } finally {
       setLoading(false)
     }
+  }, [email, navigate, password, username, verificationCode])
+
+  useEffect(() => {
+    if (step !== 3 || registrationStartedRef.current) return
+    registrationStartedRef.current = true
+    registerAccount()
+  }, [registerAccount, step])
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    if (step === 1) {
+      if (!validateRegistrationForm()) return
+      await sendVerification()
+      return
+    }
+
+    if (step === 2) {
+      setError('')
+      setLoading(true)
+
+      try {
+        const response = await fetch(`${API_BASE}/auth/verify-code`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code: verificationCode }),
+        })
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Invalid or expired code')
+        }
+
+        setStep(3)
+      } catch (verifyError) {
+        setError(verifyError.message || 'Invalid or expired code')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  const handleResendCode = async () => {
+    setError('')
+    await sendVerification()
   }
 
   return (
@@ -92,54 +182,118 @@ export default function Register() {
       <form className="auth-card" onSubmit={handleSubmit}>
         <AuthLogo />
 
-        <label>
-          <span>Username</span>
-          <input
-            type="text"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            autoComplete="username"
-            required
-          />
-        </label>
+        {step === 1 && (
+          <>
+            <label>
+              <span>Username</span>
+              <input
+                type="text"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                autoComplete="username"
+                required
+              />
+            </label>
 
-        <label>
-          <span>Email</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-            required
-          />
-        </label>
+            <label>
+              <span>Email</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
+                required
+              />
+            </label>
 
-        <label>
-          <span>Password</span>
-          <div className="password-field">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="new-password"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((value) => !value)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              title={showPassword ? 'Hide password' : 'Show password'}
-            >
-              <EyeIcon open={showPassword} />
-            </button>
-          </div>
-        </label>
+            <label>
+              <span>Password</span>
+              <div className="password-field">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  <EyeIcon open={showPassword} />
+                </button>
+              </div>
+            </label>
+
+            <label>
+              <span>Confirm Password</span>
+              <div className="password-field">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value)
+                    if (passwordError) setPasswordError('')
+                  }}
+                  autoComplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((value) => !value)}
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  title={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                >
+                  <EyeIcon open={showConfirmPassword} />
+                </button>
+              </div>
+              {passwordError && <p className="field-error">{passwordError}</p>}
+            </label>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <p className="verification-message">We sent a 6-digit code to {email}</p>
+            <label>
+              <span>Verification Code</span>
+              <input
+                className="code-input"
+                type="text"
+                value={verificationCode}
+                onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                inputMode="numeric"
+                maxLength={6}
+                required
+              />
+            </label>
+          </>
+        )}
+
+        {step === 3 && (
+          <p className="verification-message">Creating your account...</p>
+        )}
 
         {error && <p className="auth-error">{error}</p>}
 
         <button className="auth-button" type="submit" disabled={loading}>
-          {loading ? 'Registering...' : 'Register'}
+          {step === 1 && (loading ? 'Sending...' : 'REGISTER')}
+          {step === 2 && (loading ? 'Verifying...' : 'VERIFY')}
+          {step === 3 && 'Creating account...'}
         </button>
+
+        {step === 2 && (
+          <div className="verification-actions">
+            <button type="button" className="auth-text-button" onClick={handleResendCode} disabled={loading}>
+              Resend code
+            </button>
+            <button type="button" className="auth-text-button" onClick={() => setStep(1)} disabled={loading}>
+              ← Back
+            </button>
+          </div>
+        )}
 
         <p className="auth-link">
           Already have an account? <Link to="/">Login</Link>
@@ -271,6 +425,28 @@ body,
   outline: none;
 }
 
+.field-error {
+  margin: 8px 0 0;
+  color: #EF4444;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.verification-message {
+  margin: -8px 0 22px;
+  color: #9CA3AF;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.code-input {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
 .auth-button {
   width: 100%;
   padding: 14px;
@@ -293,6 +469,32 @@ body,
 }
 
 .auth-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.verification-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.auth-text-button {
+  padding: 0;
+  color: #7C3AED;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.auth-text-button:hover {
+  text-decoration: underline;
+}
+
+.auth-text-button:disabled {
   cursor: wait;
   opacity: 0.75;
 }

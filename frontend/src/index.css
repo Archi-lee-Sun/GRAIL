@@ -168,20 +168,22 @@ html.light-mode #root {
 }
 
 .light-mode .stat-tooltip {
-  color: #F1F0FF;
-  background: #1A1A1A;
+  color: var(--stat-tooltip-title, #1A1A1A);
+  background: var(--stat-tooltip-bg, #FFFFFF);
+  border-color: var(--stat-tooltip-border, #E5E7EB);
+  box-shadow: var(--stat-tooltip-shadow, 0 4px 16px rgba(0, 0, 0, 0.12));
 }
 
 .light-mode .stat-tooltip::after {
-  background: #1A1A1A;
+  background: var(--stat-tooltip-bg, #FFFFFF);
 }
 
 .light-mode .stat-tooltip strong {
-  color: #F1F0FF;
+  color: var(--stat-tooltip-title, #1A1A1A);
 }
 
 .light-mode .stat-tooltip span {
-  color: #D1D5DB;
+  color: var(--stat-tooltip-description, #6B7280);
 }
 
 .light-mode .locked-filter-banner {
