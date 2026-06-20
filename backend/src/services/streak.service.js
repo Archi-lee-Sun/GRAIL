@@ -1,13 +1,25 @@
 const { getUserStreakData, updateUserStreak } = require('../queries/streak.queries');
 
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+const startOfUtcDay = (date) => {
+    const day = new Date(date);
+    day.setUTCHours(0,0,0,0);
+    return day;
+}
+
+const addUtcDays = (date, days) => {
+    const day = startOfUtcDay(date);
+    day.setUTCDate(day.getUTCDate() + days);
+    return day;
+}
+
 const getTimeDifferenceInDays = (date1, date2) => {
     if (!date1 || !date2) return null;
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    d1.setUTCHours(0,0,0,0);
-    d2.setUTCHours(0,0,0,0);
+    const d1 = startOfUtcDay(date1);
+    const d2 = startOfUtcDay(date2);
     const diffTime = d2.getTime() - d1.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return Math.floor(diffTime / MS_PER_DAY);
 }
 
 const logStreakUpdate = ({ userId, source, oldStreak, gapDays, freezeCount, newStreak, newFreezeCount }) => {
@@ -19,7 +31,9 @@ const logStreakUpdate = ({ userId, source, oldStreak, gapDays, freezeCount, newS
 const updateStreak = async (userId) => {
     try {
         const streakData = await getUserStreakData(userId);
-        const { last_active_date, streak_count, streak_freeze_count } = streakData;
+        const { last_active_date } = streakData;
+        const streak_count = Number(streakData.streak_count || 0);
+        const streak_freeze_count = Number(streakData.streak_freeze_count || 0);
 
         const today = new Date();
         if (!last_active_date) {
@@ -62,26 +76,27 @@ const updateStreak = async (userId) => {
                 newFreezeCount: streak_freeze_count
             });
         } else if(daysSinceActive > 1) {
-            if(streak_freeze_count > 0) {
-                await updateUserStreak(userId , streak_count , streak_freeze_count - 1 , today)
+            const missedDays = daysSinceActive - 1;
+            if(streak_freeze_count >= missedDays) {
+                await updateUserStreak(userId , streak_count + 1 , streak_freeze_count - missedDays , today)
                 logStreakUpdate({
                     userId,
-                    source: 'stage-complete:freeze-used',
+                    source: 'stage-complete:freeze-covered-increment',
                     oldStreak: streak_count,
                     gapDays: daysSinceActive,
                     freezeCount: streak_freeze_count,
-                    newStreak: streak_count,
-                    newFreezeCount: streak_freeze_count - 1
+                    newStreak: streak_count + 1,
+                    newFreezeCount: streak_freeze_count - missedDays
                 });
             } else {
-                await updateUserStreak(userId , 0 , 0 , today)
+                await updateUserStreak(userId , 1 , 0 , today)
                 logStreakUpdate({
                     userId,
-                    source: 'stage-complete:reset',
+                    source: 'stage-complete:reset-start-new',
                     oldStreak: streak_count,
                     gapDays: daysSinceActive,
                     freezeCount: streak_freeze_count,
-                    newStreak: 0,
+                    newStreak: 1,
                     newFreezeCount: 0
                 });
             }
@@ -101,25 +116,30 @@ const refreshStreakStatus = async (userId) => {
         const daysSinceActive = getTimeDifferenceInDays(streakData.last_active_date, today);
         if (daysSinceActive === null || daysSinceActive <= 1) return streakData;
 
-        if (streakData.streak_freeze_count > 0) {
-            await updateUserStreak(userId, streakData.streak_count, streakData.streak_freeze_count - 1, today);
+        const streakCount = Number(streakData.streak_count || 0);
+        const freezeCount = Number(streakData.streak_freeze_count || 0);
+        const missedDays = daysSinceActive - 1;
+        const accountedThroughYesterday = addUtcDays(today, -1);
+
+        if (freezeCount >= missedDays) {
+            await updateUserStreak(userId, streakCount, freezeCount - missedDays, accountedThroughYesterday);
             logStreakUpdate({
                 userId,
-                source: 'dashboard:freeze-used',
-                oldStreak: streakData.streak_count,
+                source: 'dashboard:freeze-covered',
+                oldStreak: streakCount,
                 gapDays: daysSinceActive,
-                freezeCount: streakData.streak_freeze_count,
-                newStreak: streakData.streak_count,
-                newFreezeCount: streakData.streak_freeze_count - 1
+                freezeCount,
+                newStreak: streakCount,
+                newFreezeCount: freezeCount - missedDays
             });
         } else {
-            await updateUserStreak(userId, 0, 0, today);
+            await updateUserStreak(userId, 0, 0, accountedThroughYesterday);
             logStreakUpdate({
                 userId,
                 source: 'dashboard:reset',
-                oldStreak: streakData.streak_count,
+                oldStreak: streakCount,
                 gapDays: daysSinceActive,
-                freezeCount: streakData.streak_freeze_count,
+                freezeCount,
                 newStreak: 0,
                 newFreezeCount: 0
             });
